@@ -1,22 +1,16 @@
-import { useEffect, useEffectEvent, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { errorMessage } from '../../shared/errors'
 import { findSubtitles, pickLocaleSubtitle } from './lookup'
 import { readSubtitleCache, saveSubtitleCache } from './storage'
 import type { SubtitleSelection } from './types'
 
-export function useSubtitles(
-  id: string,
-  name: string,
-  initialLanguage: string | null | undefined,
-  onSelection: (language: string | null) => void,
-) {
+export function useSubtitles(id: string, name: string, initialLanguage: string | null | undefined) {
   const [selection, setSelection] = useState<SubtitleSelection>({
     tracks: [],
     activeLanguage: null,
   })
   const [note, setNote] = useState('')
   const initial = useRef(initialLanguage)
-  const persistSelection = useEffectEvent(onSelection)
 
   useEffect(() => {
     const controller = new AbortController()
@@ -41,16 +35,12 @@ export function useSubtitles(
           urls.push(url)
           return { url, language: item.language, label: item.label }
         })
-        const language =
-          initial.current === undefined
-            ? (pickLocaleSubtitle(
-                tracks,
-                navigator.languages.length ? navigator.languages : [navigator.language],
-              )?.language ?? null)
-            : tracks.some((track) => track.language === initial.current)
-              ? (initial.current ?? null)
-              : null
-        if (initial.current === undefined && tracks.length) persistSelection(language)
+        const language = tracks.some((track) => track.language === initial.current)
+          ? (initial.current ?? null)
+          : (pickLocaleSubtitle(
+              tracks,
+              navigator.languages.length ? navigator.languages : [navigator.language],
+            )?.language ?? null)
         setSelection({ tracks, activeLanguage: language })
         status(tracks.length ? '' : 'No subtitles found for this title.')
       } catch (error) {

@@ -4,6 +4,7 @@ import type { TorrentEngine } from '../torrent/engine.js'
 import type { Transcoder, SegmentTrack } from '../media/transcoder.js'
 import { masterPlaylist, mediaPlaylist } from '../media/hls.js'
 import { parseByteRange } from './protocol.js'
+import { isVideo } from '../torrent/ranges.js'
 
 type MediaContext = {
   engine: TorrentEngine
@@ -16,13 +17,29 @@ const CONTENT_TYPES: Record<string, string> = {
   m4v: 'video/mp4',
   webm: 'video/webm',
   ogv: 'video/ogg',
-  ogg: 'video/ogg',
+  ogg: 'audio/ogg',
+  oga: 'audio/ogg',
+  mp3: 'audio/mpeg',
+  m4a: 'audio/mp4',
+  aac: 'audio/aac',
+  wav: 'audio/wav',
+  flac: 'audio/flac',
+  opus: 'audio/ogg',
   mkv: 'video/x-matroska',
   mov: 'video/quicktime',
   avi: 'video/x-msvideo',
   mpeg: 'video/mpeg',
   mpg: 'video/mpeg',
   ts: 'video/mp2t',
+  jpg: 'image/jpeg',
+  jpeg: 'image/jpeg',
+  png: 'image/png',
+  gif: 'image/gif',
+  webp: 'image/webp',
+  avif: 'image/avif',
+  bmp: 'image/bmp',
+  ico: 'image/x-icon',
+  svg: 'image/svg+xml',
 }
 
 function serveOriginal(
@@ -44,6 +61,8 @@ function serveOriginal(
     'Accept-Ranges': 'bytes',
     'Cache-Control': 'no-store',
   }
+  if (/\.svg$/i.test(file.name))
+    headers['Content-Security-Policy'] = "sandbox; default-src 'none'; style-src 'unsafe-inline'"
   if (url.searchParams.has('download'))
     headers['Content-Disposition'] =
       `attachment; filename*=UTF-8''${encodeURIComponent(file.name).replace(/'/g, '%27')}`
@@ -86,6 +105,7 @@ export async function routeMedia(
     serveOriginal(request, response, url, file)
     return true
   }
+  if (!isVideo(file.name)) throw new Error('Only videos support compatibility playback.')
   const credentialQuery = token ? `?token=${encodeURIComponent(token)}` : ''
   const source = `${baseUrl}/media/${id}/${index}/raw${credentialQuery}`
   const metadata = await transcoder.probe(id, index, source)

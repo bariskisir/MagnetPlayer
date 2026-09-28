@@ -1,7 +1,10 @@
 import type { ByteRange, PieceMap, FileExtent } from './types.js'
 
-export const isVideo = (name: string) =>
-  /\.(mp4|m4v|webm|ogv|ogg|mov|mkv|avi|mpeg|mpg|ts)$/i.test(name)
+export const isVideo = (name: string) => /\.(mp4|m4v|webm|ogv|mov|mkv|avi|mpeg|mpg|ts)$/i.test(name)
+
+export const isAudio = (name: string) => /\.(mp3|m4a|aac|wav|flac|opus|ogg|oga)$/i.test(name)
+
+export const isImage = (name: string) => /\.(jpe?g|png|gif|webp|avif|bmp|ico|svg)$/i.test(name)
 
 export function validId(id: unknown): id is string {
   return typeof id === 'string' && /^[a-f0-9]{40}$/.test(id)

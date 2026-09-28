@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { errorMessage } from '../../shared/errors'
-import { isVideoFile } from '../../shared/media'
+import { isAudioFile, isImageFile, isVideoFile } from '../../shared/media'
 import { parseMagnetLink } from '../../shared/magnet'
 import { helperRequest } from '../helper/transport'
 import { useTorrentSession } from '../helper/useTorrentSession'
@@ -16,6 +16,9 @@ export default function useLibrary() {
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
   const [opening, setOpening] = useState(false)
+  const [canCancel, setCanCancel] = useState(false)
+  const [cancelling, setCancelling] = useState(false)
+  const cancellation = useRef<Promise<void> | null>(null)
   const records = useRef<LibraryEntry[]>([])
   const initialized = useRef(false)
   const locked = useRef(false)
@@ -29,12 +32,17 @@ export default function useLibrary() {
 
   const persist = useCallback(
     (entry: LibraryEntry) => {
+      const existing = records.current.find((item) => item.id === entry.id)
+      const next = {
+        ...entry,
+        addedAt: existing?.addedAt ?? existing?.updatedAt ?? entry.updatedAt,
+      }
       updateEntries(
-        [entry, ...records.current.filter((item) => item.id !== entry.id)].sort(
-          (a, b) => b.updatedAt - a.updatedAt,
-        ),
+        existing
+          ? records.current.map((item) => (item.id === entry.id ? next : item))
+          : [next, ...records.current],
       )
-      void saveEntry(entry).catch(() => setError(STORAGE_ERROR))
+      void saveEntry(next).catch(() => setError(STORAGE_ERROR))
     },
     [updateEntries],
   )
@@ -44,7 +52,7 @@ export default function useLibrary() {
     readLibrary()
       .then((data) => {
         if (cancelled) return
-        updateEntries(data.sort((a, b) => b.updatedAt - a.updatedAt))
+        updateEntries(data.sort((a, b) => (b.addedAt ?? b.updatedAt) - (a.addedAt ?? a.updatedAt)))
         initialized.current = true
       })
       .catch(() => {
@@ -62,6 +70,9 @@ export default function useLibrary() {
       locked.current = true
       setBusy(true)
       setOpening(true)
+      setCanCancel(false)
+      cancellation.current = null
+      const cancelTimer = setTimeout(() => setCanCancel(true), 3000)
       setError('')
       try {
         if (!initialized.current)
@@ -71,6 +82,7 @@ export default function useLibrary() {
         if (!torrent) return false
         const existing = records.current.find((entry) => entry.id === torrent.infoHash)
         const videos = torrent.files.filter((file) => isVideoFile(file.name))
+        const audio = torrent.files.filter((file) => isAudioFile(file.name))
         persist({
           id: torrent.infoHash,
           name: torrent.name,
@@ -81,9 +93,11 @@ export default function useLibrary() {
           mediaPrefs: existing?.mediaPrefs,
           updatedAt: Date.now(),
         })
-        const lastFile = saved?.lastFile ?? existing?.lastFile
         select(
-          videos.length === 1 ? videos[0] : (videos.find((file) => file.path === lastFile) ?? null),
+          [...videos, ...audio].find((file) => file.path === saved?.lastFile) ??
+            videos[0] ??
+            audio[0] ??
+            null,
         )
         return true
       } catch (error) {
@@ -91,6 +105,10 @@ export default function useLibrary() {
           setError(errorMessage(error))
         return false
       } finally {
+        clearTimeout(cancelTimer)
+        setCanCancel(false)
+        await cancellation.current
+        setCancelling(false)
         locked.current = false
         setOpening(false)
         setBusy(false)
@@ -98,6 +116,13 @@ export default function useLibrary() {
     },
     [openSession, persist, select],
   )
+
+  const cancelOpen = useCallback(() => {
+    if (!opening || !canCancel || cancellation.current) return
+    setCanCancel(false)
+    setCancelling(true)
+    cancellation.current = stop().catch((error) => setError(errorMessage(error)))
+  }, [opening, canCancel, stop])
 
   const saveProgress = useCallback(
     (id: string, path: string, time: number, duration: number) => {
@@ -176,15 +201,19 @@ export default function useLibrary() {
     }
   }, [stop, updateEntries])
 
-  const status = opening
-    ? 'Connecting to sources…'
-    : selected
-      ? 'Fetching video pieces…'
-      : active
-        ? active.files.some((file) => isVideoFile(file.name))
-          ? 'Pick a video'
-          : 'No video files in this torrent'
-        : ''
+  const status = cancelling
+    ? 'Cancelling…'
+    : opening
+      ? 'Connecting to sources…'
+      : selected
+        ? 'Fetching media pieces…'
+        : active
+          ? active.files.some((file) => isVideoFile(file.name))
+            ? 'Pick a video'
+            : active.files.some((file) => isImageFile(file.name))
+              ? 'Downloading images…'
+              : 'No media files in this torrent'
+          : ''
 
   return {
     entries,
@@ -192,6 +221,8 @@ export default function useLibrary() {
     selected,
     stats: session.stats,
     busy,
+    canCancel,
+    cancelOpen,
     status,
     error,
     open,

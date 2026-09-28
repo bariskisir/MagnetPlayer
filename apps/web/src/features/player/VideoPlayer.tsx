@@ -5,7 +5,9 @@ import { VideoPlayer as Player, VideoSkin, Video } from '@videojs/react/video'
 import { useSubtitles } from '../subtitles/useSubtitles'
 import { useSubtitleOverlay } from '../subtitles/useSubtitleOverlay'
 import { AudioPreferences } from './AudioPreferences'
+import { SubtitlePreferences } from './SubtitlePreferences'
 import PlayerPanel from './PlayerPanel'
+import { PausePlaybackContext } from './PlaybackContext'
 import { usePlayback } from './usePlayback'
 import type { MediaFile } from '../helper/types'
 import type { LibraryEntry, MediaPreferences } from '../library/types'
@@ -40,12 +42,7 @@ export default function VideoPlayer({
   const preferences = entry?.mediaPrefs?.[file.path]
   const savePreferences = (patch: MediaPreferences) => onPrefs(id, file.path, patch)
   const playback = usePlayback({ id, file, entry, onProgress, onPrefs, autoPlay })
-  const subtitles = useSubtitles(
-    `${id}/${file.path}`,
-    file.name,
-    preferences?.subtitleLanguage,
-    (language) => savePreferences({ subtitleLanguage: language }),
-  )
+  const subtitles = useSubtitles(`${id}/${file.path}`, file.name, preferences?.subtitleLanguage)
   const overlay = useSubtitleOverlay(playback.video, stageRef, subtitles, (language) => {
     subtitles.selectLanguage(language)
     savePreferences({ subtitleLanguage: language })
@@ -79,6 +76,9 @@ export default function VideoPlayer({
                 </Media>
               )}
             </Suspense>
+            {playback.source && subtitles.tracks.length > 0 && (
+              <SubtitlePreferences key={playback.source} language={subtitles.activeLanguage} />
+            )}
             {playback.source && (
               <AudioPreferences
                 key={playback.source}
@@ -97,14 +97,16 @@ export default function VideoPlayer({
           </p>
         )}
       </div>
-      <PlayerPanel
-        stats={stats}
-        length={file.length}
-        message={playback.message}
-        subtitleNote={subtitles.note}
-      >
-        {children}
-      </PlayerPanel>
+      <PausePlaybackContext value={playback.pause}>
+        <PlayerPanel
+          stats={stats}
+          length={file.length}
+          message={playback.message}
+          subtitleNote={subtitles.note}
+        >
+          {children}
+        </PlayerPanel>
+      </PausePlaybackContext>
     </>
   )
 }

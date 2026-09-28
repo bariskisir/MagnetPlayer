@@ -6,7 +6,13 @@
   flex-direction: column;
   padding: 0 28px;
 }
+.app-shell.started {
+  height: 100dvh;
+  min-height: 0;
+  overflow: hidden;
+}
 .site-header {
+  flex-shrink: 0;
   min-height: 64px;
   display: flex;
   align-items: center;
@@ -81,16 +87,21 @@
 
 .workspace {
   flex: 1;
+  min-height: 0;
+  min-width: 0;
+  overflow: hidden;
   display: grid;
   --side-width: 345px;
   grid-template-columns: 355px minmax(0, 1fr) var(--side-width);
-  align-items: start;
+  grid-template-rows: minmax(0, 1fr);
+  align-items: stretch;
 }
 .workspace main {
   min-width: 0;
   padding: 22px 0 40px 26px;
   border-left: 1px solid $line;
-  min-height: calc(100vh - 64px);
+  min-height: 0;
+  overflow: hidden;
   grid-column: 2;
 }
 .sidebar {

@@ -18,5 +18,6 @@ export type LibraryEntry = {
   lastFile?: string
   progress: Record<string, WatchProgress>
   mediaPrefs?: Record<string, MediaPreferences>
+  addedAt?: number
   updatedAt: number
 }

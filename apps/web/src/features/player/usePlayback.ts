@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useEffectEvent, useRef, useState } from 'react'
-import { supportsDirectPlayback } from '../../shared/media'
+import { isAudioFile, supportsDirectPlayback } from '../../shared/media'
 import { errorMessage } from '../../shared/errors'
 import type { MediaFile } from '../helper/types'
 import type { LibraryEntry } from '../library/types'
@@ -14,10 +14,22 @@ type PlaybackOptions = {
   onPrefs: SavePreferences
 }
 
-export function usePlayback({ id, file, entry, autoPlay, onProgress, onPrefs }: PlaybackOptions) {
-  const videoRef = useRef<HTMLVideoElement | null>(null)
-  const [video, setVideo] = useState<HTMLVideoElement | null>(null)
-  const attachVideo = useCallback((element: HTMLVideoElement | null) => {
+export function usePlayback<T extends HTMLMediaElement = HTMLVideoElement>({
+  id,
+  file,
+  entry,
+  autoPlay,
+  onProgress,
+  onPrefs,
+}: PlaybackOptions) {
+  const videoRef = useRef<T | null>(null)
+  const autoplayCancelled = useRef(false)
+  const pause = useCallback(() => {
+    autoplayCancelled.current = true
+    videoRef.current?.pause()
+  }, [])
+  const [video, setVideo] = useState<T | null>(null)
+  const attachVideo = useCallback((element: T | null) => {
     videoRef.current = element
     setVideo(element)
   }, [])
@@ -89,7 +101,7 @@ export function usePlayback({ id, file, entry, autoPlay, onProgress, onPrefs }: 
         video.currentTime = startAt.current
       syncCursor(true)
       setMessage('Ready')
-      if (autoPlay)
+      if (autoPlay && !autoplayCancelled.current)
         void video
           .play()
           .catch(() => setMessage('Press play to start; your browser blocked autoplay.'))
@@ -140,6 +152,10 @@ export function usePlayback({ id, file, entry, autoPlay, onProgress, onPrefs }: 
   }, [id, file, source, autoPlay, video])
 
   const handleError = () => {
+    if (isAudioFile(file.name)) {
+      setFailure('This audio file could not be played.')
+      return
+    }
     if (compatibility) {
       setFailure('This video could not be played.')
       return
@@ -151,6 +167,7 @@ export function usePlayback({ id, file, entry, autoPlay, onProgress, onPrefs }: 
   }
 
   return {
+    pause,
     video,
     attachVideo,
     source,

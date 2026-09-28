@@ -8,8 +8,10 @@ import FileList from '../features/player/FileList'
 import HelperConnection from '../features/helper/HelperConnection'
 import useLibrary from '../features/library/useLibrary'
 import { useHelperStatus } from '../features/helper/useHelperStatus'
+import { isAudioFile } from '../shared/media'
 
 const VideoPlayer = lazy(() => import('../features/player/VideoPlayer'))
+const AudioPlayer = lazy(() => import('../features/player/AudioPlayer'))
 
 export default function App() {
   const library = useLibrary()
@@ -17,6 +19,8 @@ export default function App() {
   const [confirmClear, setConfirmClear] = useState(false)
   const entry = library.entries.find((item) => item.id === library.active?.infoHash)
   const started = library.entries.length > 0
+  const MediaPlayer =
+    library.selected && isAudioFile(library.selected.name) ? AudioPlayer : VideoPlayer
   return (
     <div className={`app-shell ${started ? 'started' : 'empty'}`}>
       <header className="site-header">
@@ -37,6 +41,8 @@ export default function App() {
           <MagnetForm
             compact
             onAdd={library.open}
+            onCancel={library.cancelOpen}
+            canCancel={library.canCancel}
             busy={library.busy}
             connected={helper.connected}
             error={library.error}
@@ -48,6 +54,8 @@ export default function App() {
         <div className="empty-state">
           <MagnetForm
             onAdd={library.open}
+            onCancel={library.cancelOpen}
+            canCancel={library.canCancel}
             busy={library.busy}
             connected={helper.connected}
             error={library.error}
@@ -70,7 +78,7 @@ export default function App() {
                 {library.busy
                   ? 'Loading title…'
                   : library.active
-                    ? 'Choose a video to start watching.'
+                    ? 'No video or audio files in this torrent.'
                     : 'Pick a title or add a magnet.'}
               </p>
             </main>
@@ -83,7 +91,7 @@ export default function App() {
                 </div>
               }
             >
-              <VideoPlayer
+              <MediaPlayer
                 key={`${library.active.infoHash}/${library.selected.path}`}
                 id={library.active.infoHash}
                 file={library.selected}
@@ -91,20 +99,22 @@ export default function App() {
                 stats={library.stats}
                 onProgress={library.saveProgress}
                 onPrefs={library.saveMediaPrefs}
-                autoPlay={entry?.videos?.length === 1}
+                autoPlay
               >
                 <FileList
+                  key={library.active.infoHash}
                   files={library.active.files}
                   selected={library.selected}
                   entry={entry}
                   onSelect={library.select}
                 />
-              </VideoPlayer>
+              </MediaPlayer>
             </Suspense>
           )}
           {library.active && !library.selected && (
             <PlayerPanel>
               <FileList
+                key={library.active.infoHash}
                 files={library.active.files}
                 selected={library.selected}
                 entry={entry}

@@ -25,7 +25,7 @@ export default function ClearLibraryDialog({
       }}
     >
       <h2 id="clear-heading">Clear library?</h2>
-      <p>Deletes saved magnets, watch positions and cached video pieces.</p>
+      <p>Deletes saved magnets, watch positions and cached media pieces.</p>
       <div className="dialog-actions">
         <button autoFocus disabled={busy} onClick={onClose}>
           Keep

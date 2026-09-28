@@ -8,7 +8,15 @@ import { join } from 'node:path'
 import { readOptionalFile, writeFileAtomically } from '../storage/files.js'
 import { DiskPieceStore } from '../storage/piece-store.js'
 
-import { isVideo, validId, windowPieces, samePieces, downloadedRanges } from './ranges.js'
+import {
+  isVideo,
+  isAudio,
+  isImage,
+  validId,
+  windowPieces,
+  samePieces,
+  downloadedRanges,
+} from './ranges.js'
 import { VERSION } from '../config.js'
 
 export class TorrentEngine {
@@ -125,6 +133,7 @@ export class TorrentEngine {
         torrent!.once('close', closed)
       })
       check()
+      this.clearWindow()
       await writeFileAtomically(join(directory, 'metadata.torrent'), torrent.torrentFile)
       check()
       return this.snapshot()
@@ -168,14 +177,17 @@ export class TorrentEngine {
     if (!validId(id) || this.active?.infoHash !== id || !this.active.ready || this.active.destroyed)
       throw new Error('Open this torrent before requesting a file.')
     const file = Number.isSafeInteger(index) && this.active.files[index]
-    if (!file || !isVideo(file.name)) throw new Error('Video file not found.')
-    if (requireSelected && this.selected !== index)
+    if (!file || (!isVideo(file.name) && !isAudio(file.name) && !isImage(file.name)))
+      throw new Error('Media file not found.')
+    if (requireSelected && !isImage(file.name) && this.selected !== index)
       throw Object.assign(new Error('Select this video first.'), { status: 409 })
     return file
   }
 
   select(id: string, index: number, offset: number | null = null) {
     const file = this.file(id, index, false)
+    if (!isVideo(file.name) && !isAudio(file.name))
+      throw new Error('Select a video or audio file for playback.')
     if (this.selected !== index) {
       this.clearWindow()
       this.selected = index
@@ -192,6 +204,8 @@ export class TorrentEngine {
     if (typeof offset !== 'number' || !Number.isFinite(offset))
       throw new Error('A byte offset is required.')
     const file = this.file(id, index)
+    if (!isVideo(file.name) && !isAudio(file.name))
+      throw new Error('A playback cursor requires a video or audio file.')
     this.position = this.clamp(file, offset)
     this.applyWindow(file)
     return { cursor: this.position }
@@ -202,7 +216,12 @@ export class TorrentEngine {
   }
 
   private clearWindow() {
-    if (this.active && !this.active.destroyed) for (const file of this.active.files) file.deselect()
+    if (this.active && !this.active.destroyed) {
+      for (const file of this.active.files) file.deselect()
+      // File boundaries can share pieces. Restore full image selections after
+      // clearing the video window so seeking never interrupts their downloads.
+      for (const file of this.active.files) if (isImage(file.name) && file.length) file.select()
+    }
     this.window = []
   }
 

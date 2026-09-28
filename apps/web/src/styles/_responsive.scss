@@ -34,13 +34,15 @@
     margin-left: auto;
   }
   .workspace {
-    display: block;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: minmax(0, 20%) minmax(0, 1fr) minmax(0, 36%);
   }
   .sidebar {
-    position: static;
+    grid-column: 1;
+    grid-row: 1;
     min-height: 0;
     max-height: none;
-    padding: 12px 0 0;
+    padding: 8px 0 0;
   }
   .sidebar-list {
     display: flex;
@@ -56,22 +58,31 @@
     opacity: 1;
   }
   .workspace main {
+    grid-column: 1;
+    grid-row: 2;
     border-left: 0;
     padding: 16px 0 32px;
     min-height: 0;
   }
   .video-stage,
   .player-side {
+    grid-column: 1;
     border-left: 0;
-    padding: 16px 0 32px;
+    padding: 8px 0;
+  }
+  .video-stage {
+    grid-row: 2;
+  }
+  .video-stage .magnet-skin {
+    max-height: 100%;
   }
   .player-side {
-    position: static;
+    grid-row: 3;
     min-height: 0;
     max-height: none;
   }
   .files-panel {
-    overflow: visible;
+    overflow: auto;
   }
   .empty .site-header {
     gap: 20px;

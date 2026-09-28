@@ -46,6 +46,7 @@ export function useTorrentSession(onError: (message: string) => void) {
       pending.current = controller
       try {
         await helperRequest('/api/stop', { method: 'POST', signal: controller.signal })
+        controller.signal.throwIfAborted()
         const session = await openTorrentSession(magnet, controller)
         if (controller.signal.aborted) {
           session.dispose()

@@ -6,6 +6,8 @@ import { isMagnetLink } from '../../shared/magnet'
 
 type Props = {
   onAdd: (magnet: string) => Promise<boolean>
+  onCancel: () => void
+  canCancel: boolean
   busy: boolean
   connected: boolean
   compact?: boolean
@@ -15,6 +17,8 @@ type Props = {
 
 export default function MagnetForm({
   onAdd,
+  onCancel,
+  canCancel,
   busy,
   connected,
   compact = false,
@@ -49,10 +53,16 @@ export default function MagnetForm({
           />
           <button
             className="primary"
-            disabled={busy || !valid || !connected}
-            title={connected ? undefined : 'Connect the helper to add a magnet.'}
+            type={canCancel ? 'button' : 'submit'}
+            onClick={canCancel ? onCancel : undefined}
+            disabled={!canCancel && (busy || !valid || !connected)}
+            title={canCancel || connected ? undefined : 'Connect the helper to add a magnet.'}
           >
-            {busy ? (
+            {canCancel ? (
+              <>
+                Cancel <X size={16} />
+              </>
+            ) : busy ? (
               <LoaderCircle className="spin" size={17} />
             ) : (
               <>
