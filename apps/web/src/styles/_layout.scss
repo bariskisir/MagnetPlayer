@@ -91,7 +91,7 @@
   padding: 22px 0 40px 26px;
   border-left: 1px solid $line;
   min-height: calc(100vh - 64px);
-  grid-column: 2 / -1;
+  grid-column: 2;
 }
 .sidebar {
   grid-column: 1;
