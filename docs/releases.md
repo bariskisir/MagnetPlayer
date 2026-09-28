@@ -12,7 +12,7 @@ Only `magnet-player-helper` is published. The root and web manifests are private
    npm run format
    ```
 
-   This updates the helper manifest, workspace lock metadata. Use a new version for each release. Documentation links use explicit raw GitHub URLs on `master`, with no version in the URL; they also work when displayed on npm.
+   This updates the helper manifest and workspace lock metadata. Use a new version for each release. Documentation links use explicit GitHub `blob/master` URLs so they work from npm and GitHub.
 
 3. Review and commit the changes, then push the matching tag:
 
@@ -28,7 +28,7 @@ Pushing a `v*` tag triggers `publish-helper.yml`. The workflow rejects invalid o
 
 `NPM_TOKEN` is injected into the publication step's environment and mapped to `NODE_AUTH_TOKEN`, which is the variable used by setup-node's generated npm registry configuration. Tokens are never written to repository files. See [GitHub's npm publishing guide](https://docs.github.com/en/actions/tutorials/publish-packages/publish-nodejs-packages).
 
-A local tag alone does not run GitHub Actions. Existing npm versions cannot be overwritten. Raw documentation links follow `master` and become available once those files are pushed to the public repository.
+A local tag alone does not run GitHub Actions. Existing npm versions cannot be overwritten. GitHub documentation links follow `master` and become available once those files are pushed to the public repository.
 
 ## Inspect the package locally
 

@@ -10,13 +10,20 @@ if (lock.packages['packages/helper'].version !== manifest.version) {
 }
 for (const path of documentationFiles) {
   const source = readFileSync(new URL(path, repositoryRoot), 'utf8')
-  const links = [
+  const markdownLinks = [
     ...source.matchAll(
-      /https:\/\/raw\.githubusercontent\.com\/bariskisir\/MagnetPlayer\/([^/\s)]+)\//g,
+      /https:\/\/github\.com\/bariskisir\/MagnetPlayer\/blob\/([^/\s)]+)\/([^\s)]+\.md)(?:#[^\s)]*)?/g,
     ),
   ]
-  if (!links.length || links.some((match) => match[1] !== 'master')) {
-    throw new Error(`Use version-free raw GitHub URLs on master in ${path}.`)
+  const rawMarkdownLinks = source.match(
+    /https:\/\/raw\.githubusercontent\.com\/bariskisir\/MagnetPlayer\/[^\s)]+\.md(?:#[^\s)]*)?/g,
+  )
+  if (
+    !markdownLinks.length ||
+    markdownLinks.some((match) => match[1] !== 'master') ||
+    rawMarkdownLinks
+  ) {
+    throw new Error(`Use absolute GitHub blob URLs on master for Markdown links in ${path}.`)
   }
 }
 console.log(`Release v${manifest.version} is consistent.`)
