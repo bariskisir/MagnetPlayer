@@ -1,0 +1,92 @@
+// Helper connection status and settings popover styling.
+@use 'tokens' as *;
+
+.helper-panel {
+  position: relative;
+  flex-shrink: 0;
+}
+.helper-body {
+  position: absolute;
+  left: 0;
+  top: calc(100% + 8px);
+  z-index: 15;
+  width: min(418px, calc(100vw - 32px));
+  min-height: 158px;
+  padding: 18px;
+  display: grid;
+  align-content: center;
+  gap: 14px;
+  border: 1px solid $line;
+  border-radius: 10px;
+  background: $panel;
+  box-shadow: 0 14px 40px #0007;
+  font-size: 13px;
+}
+.helper-command {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.helper-command p {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  flex: 1;
+  min-width: 0;
+  color: $accent;
+  font-size: 13px;
+  overflow-wrap: anywhere;
+  margin: 0;
+}
+.copy-button {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  color: #9aa08a;
+  border: 1px solid #333a2c;
+  background: #1e2419;
+  border-radius: 5px;
+  padding: 0 9px;
+  min-height: 28px;
+}
+.copy-button.copied {
+  color: #101a06;
+  background: $accent;
+  border-color: $accent;
+}
+.helper-body form {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.helper-body input {
+  min-width: 0;
+  flex: 1;
+  padding: 10px 12px;
+  border: 1px solid $line;
+  border-radius: 6px;
+  background: $bg;
+  color: $text;
+  font-size: 12px;
+}
+.helper-body input[type='number'] {
+  flex: 0 0 84px;
+}
+.helper-body input[type='text'] {
+  flex: 0 0 104px;
+}
+.helper-body .primary {
+  padding: 10px 14px;
+  font-size: 12px;
+  min-height: 38px;
+}
+.helper-body .subtle {
+  margin: 0;
+  font-size: 12px;
+}
+.empty .helper-body {
+  left: 50%;
+  transform: translateX(-50%);
+}

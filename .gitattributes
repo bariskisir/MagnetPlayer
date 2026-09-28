@@ -1,0 +1,4 @@
+# Keep source formatting identical on Windows, macOS and Linux CI runners.
+* text=auto eol=lf
+*.png binary
+*.woff2 binary

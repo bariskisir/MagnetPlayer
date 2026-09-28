@@ -1,0 +1,22 @@
+{
+  "buildCommand": "npm run build:web --workspace @bariskisir/magnet-player-web",
+  "outputDirectory": "apps/web/dist",
+  "framework": null,
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "no-referrer"
+        }
+      ]
+    }
+  ],
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "installCommand": "npx --yes npm@12.1.0 ci --workspace @bariskisir/magnet-player-web --include-workspace-root"
+}

@@ -1,0 +1,49 @@
+// Library deletion confirmation dialog styling.
+@use 'tokens' as *;
+
+.dialog::backdrop {
+  background: #08090bd9;
+}
+.dialog {
+  color: $text;
+  width: calc(100% - 40px);
+  max-width: 380px;
+  background: $panel;
+  border: 1px solid $line;
+  border-radius: 12px;
+  padding: 22px;
+}
+.dialog h2 {
+  font-size: 16px;
+  font-weight: 500;
+}
+.dialog p {
+  color: $muted;
+  font-size: 12px;
+  line-height: 1.7;
+  margin-top: 8px;
+}
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 20px;
+}
+.dialog-actions button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  padding: 8px 14px;
+  border-radius: 6px;
+  border: 1px solid $line;
+}
+.dialog-actions .danger {
+  background: #6b3327;
+  border-color: #8a4032;
+  color: #ffe3da;
+}
+.dialog-actions .danger:not(:disabled):hover {
+  color: #fff;
+  background: #7d3a2c;
+}

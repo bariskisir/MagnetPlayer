@@ -1,0 +1,61 @@
+{
+  "name": "magnet-player-helper",
+  "version": "1.0.0",
+  "description": "Local torrent streaming companion for Magnet Player. Run with npx; browse and watch on your device.",
+  "type": "module",
+  "bin": {
+    "magnet-player-helper": "dist/cli.js"
+  },
+  "files": [
+    "dist/",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": "^22.22.2 || ^24.15.0 || >=26.0.0",
+    "npm": ">=12.1.0"
+  },
+  "author": "bariskisir",
+  "license": "MIT",
+  "homepage": "https://www.npmjs.com/package/magnet-player-helper",
+  "keywords": [
+    "magnet",
+    "torrent",
+    "streaming",
+    "local",
+    "video"
+  ],
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org"
+  },
+  "scripts": {
+    "dev": "node --watch --import tsx src/cli.ts --site http://localhost:5173 --no-open --data-dir ../../.helper-data",
+    "start": "node dist/cli.js",
+    "prepublishOnly": "npm run build",
+    "build": "tsx tools/build.ts",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "prepack": "npm run build"
+  },
+  "dependencies": {
+    "parse-torrent": "11.0.24",
+    "webtorrent": "3.0.21"
+  },
+  "optionalDependencies": {
+    "ffmpeg-static": "5.3.0"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.3",
+    "@types/webtorrent": "^3.0.0",
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bariskisir/MagnetPlayer.git",
+    "directory": "packages/helper"
+  },
+  "bugs": {
+    "url": "https://github.com/bariskisir/MagnetPlayer/issues"
+  }
+}

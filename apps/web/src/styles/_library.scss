@@ -1,0 +1,93 @@
+// Library navigation and saved title presentation.
+@use 'tokens' as *;
+
+.sidebar {
+  position: sticky;
+  top: 0;
+  min-height: calc(100vh - 64px);
+  max-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  padding: 14px 10px 14px 0;
+  border-right: 1px solid $line;
+}
+.sidebar-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 10px;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: #5d636b;
+  padding: 0 8px 10px;
+}
+.sidebar-head button {
+  display: flex;
+  padding: 0 3px;
+  min-height: 22px;
+  color: #6d727a;
+}
+.sidebar-list {
+  display: grid;
+  gap: 2px;
+  align-content: start;
+  overflow: auto;
+}
+.side-item {
+  display: flex;
+  align-items: center;
+  border-radius: 6px;
+}
+.side-item:hover {
+  background: #191c21;
+}
+.side-item.active {
+  background: #1b2016;
+}
+.side-open {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+  gap: 4px;
+  text-align: left;
+  padding: 8px 4px 8px 9px;
+}
+.side-open:disabled {
+  opacity: 0.42;
+}
+.side-item.active .side-open:disabled {
+  opacity: 1;
+  cursor: default;
+}
+.side-name {
+  font-size: 12px;
+  color: #b7bcc4;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow-wrap: anywhere;
+}
+.side-item.active .side-name {
+  color: $text;
+}
+.side-meta {
+  font-size: 10px;
+  color: #5d636b;
+  font-variant-numeric: tabular-nums;
+}
+.side-remove {
+  display: flex;
+  padding: 0 8px 0 4px;
+  min-height: 26px;
+  color: #4d525a;
+  opacity: 0;
+}
+.side-item:hover .side-remove,
+.side-remove:focus-visible {
+  opacity: 1;
+}
+.side-remove:hover {
+  color: #f0a58a;
+}

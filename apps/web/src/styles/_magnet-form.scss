@@ -1,0 +1,98 @@
+// Magnet entry, validation messages and primary form controls.
+@use 'tokens' as *;
+
+.magnet-form {
+  min-width: 0;
+}
+.magnet-form label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+.magnet-input {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 5px 5px 5px 12px;
+  background: $panel;
+  border: 1px solid $line;
+  border-radius: 9px;
+}
+.magnet-input:focus-within {
+  border-color: #6f8049;
+}
+.magnet-input > svg {
+  color: #6b7364;
+}
+.magnet-input input {
+  flex: 1;
+  min-width: 0;
+  color: $text;
+  background: none;
+  outline: none;
+  border: 0;
+  height: 32px;
+  font-size: 12px;
+}
+.magnet-input input::placeholder {
+  color: #5d636b;
+}
+.primary {
+  background: $accent;
+  color: #1d2811;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 13px;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 6px;
+  white-space: nowrap;
+}
+.primary:not(:disabled):hover {
+  color: #101a06;
+  background: #d9ffa1;
+}
+.magnet-form:not(.compact) .magnet-input {
+  padding: 7px 7px 7px 14px;
+}
+.magnet-form:not(.compact) .magnet-input input {
+  height: 38px;
+  font-size: 13px;
+}
+.magnet-form:not(.compact) .primary {
+  padding: 11px 16px;
+}
+.magnet-form .error-banner {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  max-width: 100%;
+  margin-top: 9px;
+  padding: 7px 11px;
+  border: 1px solid #784532;
+  border-radius: 7px;
+  background: #35251f;
+  color: #f0c3ad;
+  font-size: 11px;
+}
+.magnet-form .error-banner > span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.magnet-form .error-banner > button {
+  display: flex;
+  padding: 0 1px;
+  min-height: 20px;
+  color: inherit;
+}
+.started .site-header .magnet-form {
+  flex: 0 1 340px;
+}
+.started .site-header .helper-panel {
+  margin-left: auto;
+}

@@ -1,0 +1,140 @@
+// Global resets, typography, application layout and shared controls.
+@use 'tokens' as *;
+
+* {
+  box-sizing: border-box;
+}
+:root {
+  font-family: 'DM Sans', sans-serif;
+  color: $text;
+  background: $bg;
+  font-synthesis: none;
+  color-scheme: dark;
+}
+body {
+  margin: 0;
+  min-width: 320px;
+}
+button,
+input,
+select {
+  font: inherit;
+}
+button,
+a {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+button {
+  color: inherit;
+  cursor: pointer;
+  border: 0;
+  background: transparent;
+  min-height: 32px;
+}
+button:disabled {
+  opacity: 0.42;
+  cursor: not-allowed;
+}
+button:not(:disabled),
+a {
+  transition:
+    color 0.18s,
+    background 0.18s,
+    border-color 0.18s;
+}
+button:not(:disabled):hover {
+  color: $accent;
+}
+a {
+  color: inherit;
+  text-decoration: none;
+}
+a:hover {
+  color: $accent;
+}
+:focus-visible {
+  outline: 2px solid $accent;
+  outline-offset: 2px;
+}
+svg {
+  flex-shrink: 0;
+  vertical-align: middle;
+}
+h1,
+h2,
+h3,
+p {
+  margin: 0;
+}
+h2 {
+  font-family: 'Space Grotesk', sans-serif;
+}
+
+.error-banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border: 1px solid #784532;
+  border-radius: 8px;
+  background: #35251f;
+  color: #f0c3ad;
+  font-size: 12px;
+}
+.error-banner > span {
+  min-width: 0;
+}
+.error-banner > button {
+  display: flex;
+  padding: 0 2px;
+  min-height: 24px;
+}
+.subtle {
+  color: $muted;
+  font-size: 11px;
+  line-height: 1.7;
+}
+.watch-progress {
+  appearance: none;
+  display: block;
+  width: 100%;
+  border: 0;
+  background: #2a3035;
+  height: 2px;
+  overflow: hidden;
+  border-radius: 2px;
+}
+.watch-progress::-webkit-progress-bar {
+  background: #2a3035;
+}
+.watch-progress::-webkit-progress-value {
+  background: $accent;
+}
+.watch-progress::-moz-progress-bar {
+  background: $accent;
+}
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 11px;
+  color: $muted;
+  padding: 5px 9px;
+  border: 1px solid $line;
+  border-radius: 6px;
+  background: #191c21;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.badge:hover {
+  color: $text;
+}
+.spin {
+  animation: spin 0.9s linear infinite;
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

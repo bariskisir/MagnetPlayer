@@ -1,0 +1,96 @@
+# magnet-player-helper
+
+Local BitTorrent streaming companion for **https://web-magnet-player.vercel.app**.
+
+## Run
+
+Requires Node.js **22.22.2+, 24.15+ or 26+** and **npm 12.1+** on Windows, macOS or Linux:
+
+```sh
+npx --allow-scripts=node-datachannel,ffmpeg-static,utp-native,bufferutil,utf-8-validate magnet-player-helper
+```
+
+No connection key is required by default. The helper opens the website and the website connects automatically. Allow local network access if the browser prompts. Keep the terminal running while watching. Ctrl+C stops transfers and preserves downloaded pieces. This package must be published to npm before the public npx command is available.
+
+npx downloads the package on first use. The `--allow-scripts` list enables installation of WebRTC, FFmpeg and optional native transport modules under npm 12. A global install and Chrome extension are unnecessary. Node.js must already be installed. The optional `ffmpeg-static` dependency downloads an FFmpeg executable where a supported binary is available. Direct playback can work without FFmpeg; compatibility playback needs it. Mobile browsers cannot run this helper. Platforms without an available bundled binary can supply their own FFmpeg path.
+
+## Options
+
+```sh
+npx --allow-scripts=node-datachannel,ffmpeg-static,utp-native,bufferutil,utf-8-validate magnet-player-helper --help
+npx --allow-scripts=node-datachannel,ffmpeg-static,utp-native,bufferutil,utf-8-validate magnet-player-helper --site http://localhost:5173 --no-open
+npx --allow-scripts=node-datachannel,ffmpeg-static,utp-native,bufferutil,utf-8-validate magnet-player-helper --port 45892
+npx --allow-scripts=node-datachannel,ffmpeg-static,utp-native,bufferutil,utf-8-validate magnet-player-helper --bind 0.0.0.0
+npx --allow-scripts=node-datachannel,ffmpeg-static,utp-native,bufferutil,utf-8-validate magnet-player-helper --data-dir /path/to/cache
+npx --allow-scripts=node-datachannel,ffmpeg-static,utp-native,bufferutil,utf-8-validate magnet-player-helper --ffmpeg /path/to/ffmpeg
+npx --allow-scripts=node-datachannel,ffmpeg-static,utp-native,bufferutil,utf-8-validate magnet-player-helper --auth
+```
+
+| Option                | Behavior                                                                                           |
+| --------------------- | -------------------------------------------------------------------------------------------------- |
+| `--site URL`          | Website to open and allow; defaults to `https://web-magnet-player.vercel.app/`.                    |
+| `--port NUMBER`       | Port, default `45891`; accepted range `1024–65535`.                                                |
+| `--bind ADDRESS`      | Address to listen on, default `127.0.0.1`. `0.0.0.0` exposes it to the local network.              |
+| `--data-dir PATH`     | Override the persistent application data directory.                                                |
+| `--ffmpeg PATH`       | Override the optional FFmpeg executable; also supports `MAGNET_PLAYER_FFMPEG`.                     |
+| `--no-open`           | Print the connection link without launching a browser.                                             |
+| `--auth`              | Enable an optional random connection key for this run. The connection link fills it automatically. |
+| `--help`, `--version` | Show help or the package version without starting transfers.                                       |
+
+Use `--site` for local development or a self-hosted player. It sets both the website opened by the helper and the single browser origin allowed to connect. The repository's helper development command uses `http://localhost:5173`.
+
+The service binds to `127.0.0.1` by default. It accepts the loopback names and its own bind address in the Host header, and rejects browser requests from origins other than `--site`. In default keyless mode, programs running locally can also call the API without credentials. Use `--auth` if you want credentials. In that mode the key is sent to the website in a URL fragment, removed from the address bar, held in session storage, and passed as a bearer token or a media-request query parameter. A restart generates a new key.
+
+To watch from another device on the same network, start the helper with `--bind 0.0.0.0`, then open the website on that device and set the helper host in the connection popup to the computer's IP address.
+
+Use one active streaming tab at a time. One process may use a data folder; a lock prevents a second instance from racing its piece store.
+
+## Data locations
+
+| OS      | Default folder                                                                  |
+| ------- | ------------------------------------------------------------------------------- |
+| Windows | `%LOCALAPPDATA%\MagnetPlayerHelper`                                             |
+| macOS   | `~/Library/Application Support/MagnetPlayerHelper`                              |
+| Linux   | `$XDG_DATA_HOME/magnet-player-helper`, or `~/.local/share/magnet-player-helper` |
+
+Under `torrents/<v1-info-hash>/`, the helper stores `metadata.torrent`, numbered verified `.piece` files and converted HLS segments. Cache filenames are generated by the helper; paths supplied by torrent metadata are never used as disk destinations. Piece writes are atomic and cached pieces are verified when reopened.
+
+Only the selected video downloads, with any shared boundary pieces required by BitTorrent, and only the window around the playhead: a short rewind buffer plus a lookahead in front of the current byte. A file that is watched from the middle is never fetched from the start, and once the window is cached the transfer goes idle until the playhead moves. Uploading downloaded pieces to other peers is possible while the session is active. Ctrl+C stops transfers. Closing the website does not stop the helper.
+
+The website's Remove title / Clear library actions delete managed caches while connected. Clearing browser data alone does not delete disk caches. To erase all helper data manually, stop the helper first and remove its data directory. Separately exported Downloads files remain independent.
+
+## Local API
+
+`http://127.0.0.1:45891` by default. There is no hosted backend.
+
+| Method and path                         | Purpose                                                                                     |
+| --------------------------------------- | ------------------------------------------------------------------------------------------- |
+| `GET /health`                           | Name, version, API version; no key required.                                                |
+| `GET /api/pair`                         | Connection check.                                                                           |
+| `POST /api/torrents`                    | JSON `{ "magnet": "magnet:?…" }`; wait for metadata, select no files.                       |
+| `GET /api/torrents/:hash`               | Active title, files, selection and transfer statistics.                                     |
+| `POST /api/torrents/:hash/select`       | JSON `{ "index": 0, "offset": 0 }`; select one video, optionally at a byte offset.          |
+| `POST /api/torrents/:hash/cursor`       | JSON `{ "index": 0, "offset": 1234 }`; move the download window to the playhead.            |
+| `POST /api/stop`                        | Stop transfers, preserve data.                                                              |
+| `DELETE /api/torrents/:hash`            | Delete one managed title.                                                                   |
+| `DELETE /api/library`                   | Delete managed torrent caches.                                                              |
+| `GET /media/:hash/:index/raw`           | Selected original video; supports HEAD and byte ranges. Add `download=1` for an attachment. |
+| `GET /media/:hash/:index/playlist.m3u8` | HLS VOD playlist for local compatibility conversion.                                        |
+| `GET /media/:hash/:index/:segment.ts`   | Cached or on-demand four-second H.264/AAC segment.                                          |
+
+With `--auth`, include `Authorization: Bearer <key>` for API calls or `?token=<key>` for media. Otherwise omit credentials. Requests never accept arbitrary filesystem paths. Content stays on the visitor's machine; ordinary torrent discovery uses the magnet's trackers, DHT and peer exchange.
+
+## Playback troubleshooting
+
+- Metadata timeout: confirm the magnet has reachable seeders and working trackers. A valid URL alone cannot provide unavailable content.
+- Connection failed: keep the helper open, allow local network access, and make sure `--site` matches the browser's exact origin. Loopback access depends on browser permission and platform support.
+- Port in use: stop the existing helper, or use `--port` and open its printed connection link.
+- Unsupported codec: choose Compatibility playback. FFmpeg converts segments locally; HEVC/10-bit or high resolution may take substantial CPU.
+- FFmpeg unavailable: supply `--ffmpeg` or `MAGNET_PLAYER_FFMPEG` with the executable path. A package download blocked by network policy may leave the optional dependency unavailable.
+- Interrupted downloads: start the helper again, reopen the saved title, and cached pieces will be verified and reused. Missing pieces still need peers.
+
+## Licensing
+
+Helper source: MIT, included in LICENSE. WebTorrent and other dependencies have their own licenses. `ffmpeg-static` is a separately licensed optional package; its provided FFmpeg binaries have FFmpeg's applicable licensing, including GPL configurations. Binary download occurs through that dependency's installation process, rather than embedding FFmpeg inside this package's tarball. Review [ffmpeg-static](https://github.com/eugeneware/ffmpeg-static) and [FFmpeg licensing](https://ffmpeg.org/legal.html) when distributing binaries or modified builds.
+
+Direct runtime dependencies use exact versions. The repository's `package-lock.json` records development installations; dependencies are resolved by npm when the published helper is installed.

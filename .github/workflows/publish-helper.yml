@@ -1,0 +1,55 @@
+# Publish only the helper workspace after validating a pushed version tag.
+name: Publish helper
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: read
+
+concurrency:
+  group: npm-helper-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - run: npm install --global npm@12.1.0
+      - run: npm ci
+      - run: npm run release:check
+
+  checks:
+    needs: release
+    uses: ./.github/workflows/checks.yml
+
+  publish:
+    needs: checks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          registry-url: https://registry.npmjs.org
+      - run: npm install --global npm@12.1.0
+      - run: npm ci
+      - run: npm run helper:check
+      - name: Publish helper workspace
+        shell: bash
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          if [ -z "$NPM_TOKEN" ]; then
+            echo "NPM_TOKEN must be configured as a GitHub Actions secret."
+            exit 1
+          fi
+          export NODE_AUTH_TOKEN="$NPM_TOKEN"
+          dist_tag=latest
+          if [[ "$GITHUB_REF_NAME" == *-* ]]; then dist_tag=next; fi
+          npm publish --workspace magnet-player-helper --access public --tag "$dist_tag"
