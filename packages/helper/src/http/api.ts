@@ -2,6 +2,7 @@ import type { IncomingMessage, ServerResponse } from 'node:http'
 import type { TorrentEngine } from '../torrent/engine.js'
 import type { Transcoder } from '../media/transcoder.js'
 import { readJsonBody, sendJson } from './protocol.js'
+import { searchProviders } from './search/index.js'
 
 export async function routeApi(
   request: IncomingMessage,
@@ -14,7 +15,20 @@ export async function routeApi(
   const method = request.method
   let result: unknown
   if (pathname === '/api/pair' && method === 'GET') result = { connected: true }
-  else if (pathname === '/api/torrents' && method === 'POST') {
+  else if (pathname === '/api/search' && method === 'GET') {
+    const controller = new AbortController()
+    const cancel = () => controller.abort()
+    response.once('close', cancel)
+    try {
+      result = await searchProviders(
+        url.searchParams.get('q') ?? '',
+        url.searchParams.get('provider') || 'piratebay',
+        controller.signal,
+      )
+    } finally {
+      response.removeListener('close', cancel)
+    }
+  } else if (pathname === '/api/torrents' && method === 'POST') {
     const { magnet } = await readJsonBody(request)
     await transcoder.stop()
     result = await engine.open(magnet ?? '')

@@ -5,8 +5,10 @@
 After the helper has been published to npm, visitors install Node.js and run:
 
 ```sh
-npx --allow-scripts=node-datachannel,ffmpeg-static,utp-native,bufferutil,utf-8-validate magnet-player-helper
+npx magnet-player-helper
 ```
+
+For a fresh npm 12 install, run the [setup command](https://github.com/bariskisir/MagnetPlayer/blob/master/docs/helper.md#first-install-with-npm-12) first. After setup, use the short command above.
 
 The first run downloads the npm package and, where supported, an optional FFmpeg binary. The helper opens the website and connects **without a key by default**. Keep the terminal open while watching. No browser extension or global npm installation is required. Browsers may ask for local network access; allow it for the site. The npm package must actually be published before this public npx command works.
 
@@ -22,6 +24,10 @@ After the first title the app switches to the workspace: a library on the left, 
 
 ## Playback and storage
 
+- **Search Online** searches Pirate Bay by default. The provider selector also offers Torrents-csv, Knaben and YTS. **All** searches these providers concurrently, merges matching torrent hashes, and lists their sources without adding their seeder counts together. Search collects up to 500 distinct results and shows 100 per page; selection survives page changes and sorting. Sort using the column headings, select titles and press **Add** to save all selected magnets before opening the first title. Existing library titles are skipped.
+- Changing the provider reruns the current query. Requests use the local helper, with a 20-second search budget. Collected results survive later request failures; a notice identifies unavailable providers or incomplete results. Unknown statistics appear as a dash.
+- Provider magnets keep their trackers and web seeds. Hash-only results receive public discovery trackers. Search seeder counts are reported by the providers and can differ from connected peers. Provider endpoints may become unavailable independently of torrent seed availability.
+
 - Adding a magnet automatically selects its first video and attempts playback. Opening a saved title restores its last video and position. If the browser blocks autoplay, press Play once.
 - **Only the window around the playhead downloads.** The helper follows the player: a short rewind buffer plus a lookahead in front of the current byte, never the whole file. Starting a file at 90% and watching to the end downloads that tail, not the start. Pausing playback keeps filling the current window, and replaying a cached section needs no peers.
 - The download map marks verified torrent pieces at their actual positions in file order, including gaps, with a playhead marker.
@@ -36,4 +42,4 @@ After the first title the app switches to the workspace: a library on the left, 
 - Clearing browser **site data** removes the library and positions, but cannot remove helper files on disk. Clearing browsing history alone may leave site data intact. To remove both, use the app's Clear library action while connected, or remove the helper's data folder after stopping it.
 - Use one active streaming tab per helper. There is no account, synchronization or offline app-shell installation. Cached content can be reused without peers after loading the website. Site history is specific to a browser profile and origin.
 
-See [the helper README](https://raw.githubusercontent.com/bariskisir/MagnetPlayer/master/docs/helper.md) for data locations, CLI options and local API details, and [the web README](https://raw.githubusercontent.com/bariskisir/MagnetPlayer/master/docs/development.md) for frontend development.
+See [the helper README](https://github.com/bariskisir/MagnetPlayer/blob/master/docs/helper.md) for data locations, CLI options and local API details, and [the web README](https://github.com/bariskisir/MagnetPlayer/blob/master/docs/development.md) for frontend development.

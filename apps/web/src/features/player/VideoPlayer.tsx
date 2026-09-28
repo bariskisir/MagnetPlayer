@@ -77,11 +77,14 @@ export default function VideoPlayer({
               )}
             </Suspense>
             {playback.source && subtitles.tracks.length > 0 && (
-              <SubtitlePreferences key={playback.source} language={subtitles.activeLanguage} />
+              <SubtitlePreferences
+                key={`subtitle:${playback.source}`}
+                language={subtitles.activeLanguage}
+              />
             )}
             {playback.source && (
               <AudioPreferences
-                key={playback.source}
+                key={`audio:${playback.source}`}
                 initialTrack={preferences?.audioTrack}
                 onChange={(audioTrack) => savePreferences({ audioTrack })}
               />

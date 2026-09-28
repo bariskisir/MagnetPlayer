@@ -56,6 +56,15 @@
   background: $accent;
   border-color: $accent;
 }
+.helper-setup summary {
+  cursor: pointer;
+  color: $muted;
+  font-size: 12px;
+}
+.helper-setup[open] > p,
+.helper-setup[open] > .helper-command {
+  margin-top: 10px;
+}
 .helper-body form {
   display: flex;
   gap: 6px;

@@ -9,22 +9,34 @@
 <p align="center">
   <a href="https://www.npmjs.com/package/magnet-player-helper"><img src="https://img.shields.io/npm/v/magnet-player-helper?style=flat-square&amp;logo=npm&amp;labelColor=101216&amp;color=c8f57b" alt="npm version" /></a>
   <a href="https://github.com/bariskisir/MagnetPlayer/tags"><img src="https://img.shields.io/github/v/tag/bariskisir/MagnetPlayer?style=flat-square&amp;label=tag&amp;labelColor=101216&amp;color=c8f57b" alt="Latest tag" /></a>
-  <a href="https://raw.githubusercontent.com/bariskisir/MagnetPlayer/master/LICENSE"><img src="https://img.shields.io/badge/license-MIT-c8f57b?style=flat-square&amp;labelColor=101216" alt="MIT license" /></a>
+  <a href="https://github.com/bariskisir/MagnetPlayer/blob/master/LICENSE"><img src="https://img.shields.io/badge/license-MIT-c8f57b?style=flat-square&amp;labelColor=101216" alt="MIT license" /></a>
 </p>
 
 <p align="center">
   <a href="https://web-magnet-player.vercel.app">https://web-magnet-player.vercel.app</a>
 </p>
 
+Check your npm version with `npm --version`, then run the matching command.
+
+**npm 11:**
+
+```sh
+npx magnet-player-helper
+```
+
+**npm 12 and later:**
+
 ```sh
 npx --allow-scripts=node-datachannel,ffmpeg-static,utp-native,bufferutil,utf-8-validate magnet-player-helper
 ```
+
+npm 12 blocks dependency install scripts by default; the longer command permits the required components to install. After setup, the short command works while the installed package remains in the npx cache. See [setup details](https://github.com/bariskisir/MagnetPlayer/blob/master/docs/helper.md#first-install-with-npm-12).
 
 <p align="center">
   <img src="https://raw.githubusercontent.com/bariskisir/MagnetPlayer/master/docs/assets/screenshot.png" width="100%" alt="Magnet Player streaming a video" />
 </p>
 
-- [Usage](https://raw.githubusercontent.com/bariskisir/MagnetPlayer/master/docs/usage.md)
-- [Development](https://raw.githubusercontent.com/bariskisir/MagnetPlayer/master/docs/development.md)
-- [Releases](https://raw.githubusercontent.com/bariskisir/MagnetPlayer/master/docs/releases.md)
-- [MIT License](https://raw.githubusercontent.com/bariskisir/MagnetPlayer/master/LICENSE)
+- [Usage](https://github.com/bariskisir/MagnetPlayer/blob/master/docs/usage.md)
+- [Development](https://github.com/bariskisir/MagnetPlayer/blob/master/docs/development.md)
+- [Releases](https://github.com/bariskisir/MagnetPlayer/blob/master/docs/releases.md)
+- [MIT License](https://github.com/bariskisir/MagnetPlayer/blob/master/LICENSE)

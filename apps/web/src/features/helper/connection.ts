@@ -1,7 +1,8 @@
 import type { HelperConnectionSettings as Connection } from './types'
 
 const KEY = 'magnet-player-helper-connection'
-export const HELPER_COMMAND =
+export const HELPER_COMMAND = 'npx magnet-player-helper'
+export const HELPER_SETUP_COMMAND =
   'npx --allow-scripts=node-datachannel,ffmpeg-static,utp-native,bufferutil,utf-8-validate magnet-player-helper'
 
 const defaultConnection: Connection = { token: '', port: 45891, host: '127.0.0.1' }

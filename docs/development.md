@@ -59,4 +59,4 @@ The manifests list allowed dependency install scripts explicitly. The package-ma
 
 The subtitle font is a separately licensed asset. Its license is independent of the source code's MIT license.
 
-See [releases and deployment](https://raw.githubusercontent.com/bariskisir/MagnetPlayer/master/docs/releases.md) for npm and Vercel configuration.
+See [releases and deployment](https://github.com/bariskisir/MagnetPlayer/blob/master/docs/releases.md) for npm and Vercel configuration.

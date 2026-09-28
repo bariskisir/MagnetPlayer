@@ -13,6 +13,13 @@ export function saveEntry(entry: LibraryEntry) {
   )
 }
 
+export function saveEntries(entries: LibraryEntry[]) {
+  return transaction(['library'], 'readwrite', (tx) => {
+    const store = tx.objectStore('library')
+    for (const entry of entries) store.put(entry)
+  })
+}
+
 export function deleteEntry(id: string) {
   return transaction(['library', 'subtitles'], 'readwrite', (tx) => {
     tx.objectStore('library').delete(id)

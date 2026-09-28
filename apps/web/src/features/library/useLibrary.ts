@@ -4,7 +4,7 @@ import { isAudioFile, isImageFile, isVideoFile } from '../../shared/media'
 import { parseMagnetLink } from '../../shared/magnet'
 import { helperRequest } from '../helper/transport'
 import { useTorrentSession } from '../helper/useTorrentSession'
-import { clearLibrary, deleteEntry, readLibrary, saveEntry } from './storage'
+import { clearLibrary, deleteEntry, readLibrary, saveEntry, saveEntries } from './storage'
 import type { LibraryEntry, MediaPreferences } from './types'
 import type { MediaFile } from '../helper/types'
 
@@ -124,6 +124,49 @@ export default function useLibrary() {
     cancellation.current = stop().catch((error) => setError(errorMessage(error)))
   }, [opening, canCancel, stop])
 
+  const addMany = useCallback(
+    async (items: { id: string; name: string; magnet: string }[]) => {
+      if (locked.current) throw new Error('Wait for the current library operation to finish.')
+      if (!initialized.current)
+        throw new Error('Browser storage is still loading. Please try again.')
+      locked.current = true
+      setBusy(true)
+      try {
+        const known = new Set(records.current.map((entry) => entry.id))
+        const now = Date.now()
+        const added: LibraryEntry[] = []
+        for (const item of items) {
+          const id = item.id.toLowerCase()
+          if (known.has(id)) continue
+          const magnet = parseMagnetLink(item.magnet)
+          if (
+            !/^[a-f0-9]{40}$/.test(id) ||
+            new URL(magnet).searchParams.get('xt')?.toLowerCase() !== `urn:btih:${id}`
+          )
+            throw new Error('Invalid torrent in search results.')
+          known.add(id)
+          added.push({
+            id,
+            name: item.name,
+            magnet,
+            videos: [],
+            progress: {},
+            addedAt: now,
+            updatedAt: now,
+          })
+        }
+        await saveEntries(added)
+        updateEntries([...added, ...records.current])
+      } catch (error) {
+        throw new Error(`Could not add search results: ${errorMessage(error)}`)
+      } finally {
+        locked.current = false
+        setBusy(false)
+      }
+    },
+    [updateEntries],
+  )
+
   const saveProgress = useCallback(
     (id: string, path: string, time: number, duration: number) => {
       const entry = records.current.find((item) => item.id === id)
@@ -226,6 +269,7 @@ export default function useLibrary() {
     status,
     error,
     open,
+    addMany,
     select: selectFile,
     saveProgress,
     saveMediaPrefs,

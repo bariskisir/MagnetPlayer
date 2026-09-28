@@ -2,7 +2,12 @@ import { errorMessage as describeError } from '../../shared/errors'
 import { useEffect, useRef, useState } from 'react'
 import type { FormEvent } from 'react'
 import { Check, Copy, Terminal } from 'lucide-react'
-import { HELPER_COMMAND, configureHelper, helperConnection } from './connection'
+import {
+  HELPER_COMMAND,
+  HELPER_SETUP_COMMAND,
+  configureHelper,
+  helperConnection,
+} from './connection'
 
 export default function HelperConnection({
   connected,
@@ -16,19 +21,19 @@ export default function HelperConnection({
   const [port, setPort] = useState(String(current?.port || 45891))
   const [key, setKey] = useState('')
   const [busy, setBusy] = useState(false)
-  const [copied, setCopied] = useState(false)
+  const [copied, setCopied] = useState<string | null>(null)
   const [open, setOpen] = useState(false)
   const [message, setMessage] = useState('')
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const panel = useRef<HTMLDivElement | null>(null)
   useEffect(() => () => clearTimeout(timer.current ?? undefined), [])
 
-  const copy = async () => {
+  const copy = async (command = HELPER_COMMAND) => {
     try {
-      await navigator.clipboard.writeText(HELPER_COMMAND)
-      setCopied(true)
+      await navigator.clipboard.writeText(command)
+      setCopied(command)
       clearTimeout(timer.current ?? undefined)
-      timer.current = setTimeout(() => setCopied(false), 1600)
+      timer.current = setTimeout(() => setCopied(null), 1600)
     } catch {
       setMessage('Copy failed. Select the command and copy it manually.')
     }
@@ -69,14 +74,36 @@ export default function HelperConnection({
               <Terminal size={15} /> {HELPER_COMMAND}
             </p>
             <button
-              className={`copy-button ${copied ? 'copied' : ''}`}
-              onClick={copy}
-              aria-label={copied ? 'Copied' : 'Copy the helper command'}
+              className={`copy-button ${copied === HELPER_COMMAND ? 'copied' : ''}`}
+              onClick={() => void copy()}
+              aria-label={copied === HELPER_COMMAND ? 'Copied' : 'Copy the helper command'}
             >
-              {copied ? <Check size={15} /> : <Copy size={15} />}
-              <span role="status">{copied ? 'Copied' : 'Copy'}</span>
+              {copied === HELPER_COMMAND ? <Check size={15} /> : <Copy size={15} />}
+              <span role="status">{copied === HELPER_COMMAND ? 'Copied' : 'Copy'}</span>
             </button>
           </div>
+          <details className="helper-setup">
+            <summary>First install with npm 12?</summary>
+            <p className="subtle">
+              Run this command to install required components. Use the short command afterward. New
+              package versions or clearing the npx cache may require setup again.
+            </p>
+            <div className="helper-command">
+              <p>{HELPER_SETUP_COMMAND}</p>
+              <button
+                className={`copy-button ${copied === HELPER_SETUP_COMMAND ? 'copied' : ''}`}
+                onClick={() => void copy(HELPER_SETUP_COMMAND)}
+                aria-label={
+                  copied === HELPER_SETUP_COMMAND
+                    ? 'Setup command copied'
+                    : 'Copy the setup command'
+                }
+              >
+                {copied === HELPER_SETUP_COMMAND ? <Check size={15} /> : <Copy size={15} />}
+                <span role="status">{copied === HELPER_SETUP_COMMAND ? 'Copied' : 'Copy'}</span>
+              </button>
+            </div>
+          </details>
           <form
             onSubmit={async (event: FormEvent) => {
               event.preventDefault()

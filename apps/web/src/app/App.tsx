@@ -1,5 +1,6 @@
 import { lazy, Suspense, useState } from 'react'
-import { Magnet } from 'lucide-react'
+import { Magnet, Search } from 'lucide-react'
+import OnlineSearchDialog, { searchMagnet } from '../features/library/OnlineSearchDialog'
 import ClearLibraryDialog from '../features/library/ClearLibraryDialog'
 import PlayerPanel from '../features/player/PlayerPanel'
 import MagnetForm from '../features/library/MagnetForm'
@@ -17,6 +18,7 @@ export default function App() {
   const library = useLibrary()
   const helper = useHelperStatus()
   const [confirmClear, setConfirmClear] = useState(false)
+  const [searchOnline, setSearchOnline] = useState(false)
   const entry = library.entries.find((item) => item.id === library.active?.infoHash)
   const started = library.entries.length > 0
   const MediaPlayer =
@@ -36,6 +38,9 @@ export default function App() {
             <span className="session-label">{library.status || 'Idle'}</span>
           </div>
         )}
+        <button className="badge search-online-button" onClick={() => setSearchOnline(true)}>
+          <Search size={14} /> Search Online
+        </button>
         <HelperConnection connected={helper.connected} checkConnection={helper.check} />
         {started && (
           <MagnetForm
@@ -76,7 +81,7 @@ export default function App() {
             <main>
               <p className="empty-hint">
                 {library.busy
-                  ? 'Loading title…'
+                  ? 'Connecting to peers and fetching torrent metadata…'
                   : library.active
                     ? 'No video or audio files in this torrent.'
                     : 'Pick a title or add a magnet.'}
@@ -129,6 +134,24 @@ export default function App() {
           busy={library.busy}
           onConfirm={library.clear}
           onClose={() => setConfirmClear(false)}
+        />
+      )}
+      {searchOnline && (
+        <OnlineSearchDialog
+          entries={library.entries}
+          busy={library.busy}
+          onClose={() => setSearchOnline(false)}
+          onAdd={async (results) => {
+            await library.addMany(
+              results.map((result) => ({
+                id: result.infoHash,
+                name: result.name,
+                magnet: searchMagnet(result),
+              })),
+            )
+            setSearchOnline(false)
+            if (results[0]) void library.open(searchMagnet(results[0]))
+          }}
         />
       )}
     </div>

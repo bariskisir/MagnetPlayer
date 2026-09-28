@@ -1,0 +1,190 @@
+@use 'tokens' as *;
+
+.search-online-button {
+  flex-shrink: 0;
+}
+.started .site-header {
+  flex-wrap: wrap;
+  padding: 10px 0;
+  gap: 12px;
+}
+.online-search {
+  width: calc(100% - 28px);
+  max-width: 1200px;
+  height: min(760px, calc(100dvh - 40px));
+  max-height: calc(100dvh - 40px);
+  padding: 18px;
+  overflow: hidden;
+}
+.online-search[open] {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.search-heading,
+.online-search-form,
+.search-toolbar,
+.search-footer {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+.search-heading {
+  justify-content: space-between;
+}
+.online-search-form input {
+  min-width: 0;
+  flex: 1;
+  padding: 10px 12px;
+  color: $text;
+  background: $bg;
+  border: 1px solid $line;
+  border-radius: 6px;
+}
+.online-search button.primary {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  border-radius: 6px;
+  padding: 9px 16px;
+  background: $accent;
+  color: #1d2811;
+}
+.search-provider {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 11px;
+  color: $muted;
+  min-width: 0;
+}
+.search-provider select {
+  width: 150px;
+  max-width: 100%;
+  padding: 9px;
+  font-size: 12px;
+  color: $text;
+  background: $bg;
+  border: 1px solid $line;
+  border-radius: 6px;
+}
+.search-provider select:disabled {
+  opacity: 0.5;
+}
+.search-toolbar {
+  font-size: 12px;
+  color: $muted;
+  flex-wrap: wrap;
+}
+.search-toolbar > span {
+  margin-right: auto;
+}
+.search-results {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+  border: 1px solid $line;
+  border-radius: 6px;
+}
+.search-results > p {
+  padding: 20px;
+}
+.search-results table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 12px;
+}
+.search-results th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: $panel;
+  text-align: left;
+}
+.search-results th,
+.search-results td {
+  padding: 8px 10px;
+  border-bottom: 1px solid $line;
+  white-space: nowrap;
+}
+.search-results th button {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 0;
+  font-size: 11px;
+}
+.search-results .search-name {
+  min-width: 260px;
+  max-width: 380px;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+.search-name .subtle {
+  display: block;
+}
+.search-results .search-seeders {
+  color: $accent;
+}
+.search-results input[type='checkbox'] {
+  width: 16px;
+  height: 16px;
+  accent-color: $accent;
+  cursor: pointer;
+}
+.search-results tr.selected td {
+  background: #c8f57b0b;
+}
+.search-footer {
+  font-size: 12px;
+}
+.search-footer > span {
+  color: $muted;
+  margin-right: auto;
+}
+.search-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  flex-shrink: 0;
+  font-size: 12px;
+  color: $muted;
+}
+.search-pagination > span {
+  margin-right: auto;
+}
+.search-pagination select {
+  background: $bg;
+  color: $text;
+  border: 1px solid $line;
+  border-radius: 4px;
+  padding: 4px;
+}
+@media (max-width: 700px) {
+  .online-search-form {
+    flex-wrap: wrap;
+  }
+  .online-search-form input {
+    flex-basis: 100%;
+  }
+  .search-provider {
+    flex: 1;
+  }
+  .search-provider select {
+    width: 100%;
+  }
+  .online-search {
+    padding: 12px;
+  }
+  .search-toolbar > span {
+    flex-basis: 100%;
+  }
+  .started .session-status {
+    max-width: calc(100% - 160px);
+  }
+}

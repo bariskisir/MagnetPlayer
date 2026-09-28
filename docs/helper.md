@@ -7,23 +7,35 @@ Local BitTorrent streaming companion for **https://web-magnet-player.vercel.app*
 Requires Node.js **22.22.2+, 24.15+ or 26+** and **npm 12.1+** on Windows, macOS or Linux:
 
 ```sh
-npx --allow-scripts=node-datachannel,ffmpeg-static,utp-native,bufferutil,utf-8-validate magnet-player-helper
+npx magnet-player-helper
 ```
+
+For a fresh npm 12 installation, run the setup command below first. The short command works afterward while the installed package remains in the npx cache.
 
 No connection key is required by default. The helper opens the website and the website connects automatically. Allow local network access if the browser prompts. Keep the terminal running while watching. Ctrl+C stops transfers and preserves downloaded pieces. This package must be published to npm before the public npx command is available.
 
-npx downloads the package on first use. The `--allow-scripts` list enables installation of WebRTC, FFmpeg and optional native transport modules under npm 12. A global install and Chrome extension are unnecessary. Node.js must already be installed. The optional `ffmpeg-static` dependency downloads an FFmpeg executable where a supported binary is available. Direct playback can work without FFmpeg; compatibility playback needs it. Mobile browsers cannot run this helper. Platforms without an available bundled binary can supply their own FFmpeg path.
+npx downloads the package on first use. A global install and Chrome extension are unnecessary. Node.js must already be installed. The optional `ffmpeg-static` dependency downloads an FFmpeg executable where a supported binary is available. Direct playback can work without FFmpeg; compatibility playback needs it. Mobile browsers cannot run this helper. Platforms without an available bundled binary can supply their own FFmpeg path.
+
+## First install with npm 12
+
+npm 12 blocks unapproved dependency install scripts by default. This setup command permits installation of WebRTC, FFmpeg and optional native transport components:
+
+```sh
+npx --allow-scripts=node-datachannel,ffmpeg-static,utp-native,bufferutil,utf-8-validate magnet-player-helper
+```
+
+Use `npx magnet-player-helper` for subsequent runs. Installing a new version or clearing the npx cache may require the setup command again. npm 11 normally runs dependency install scripts without this flag, unless scripts were disabled in your npm configuration. See [npm's install-script configuration](https://docs.npmjs.com/cli/v12/using-npm/config/#allow-scripts).
 
 ## Options
 
 ```sh
-npx --allow-scripts=node-datachannel,ffmpeg-static,utp-native,bufferutil,utf-8-validate magnet-player-helper --help
-npx --allow-scripts=node-datachannel,ffmpeg-static,utp-native,bufferutil,utf-8-validate magnet-player-helper --site http://localhost:5173 --no-open
-npx --allow-scripts=node-datachannel,ffmpeg-static,utp-native,bufferutil,utf-8-validate magnet-player-helper --port 45892
-npx --allow-scripts=node-datachannel,ffmpeg-static,utp-native,bufferutil,utf-8-validate magnet-player-helper --bind 0.0.0.0
-npx --allow-scripts=node-datachannel,ffmpeg-static,utp-native,bufferutil,utf-8-validate magnet-player-helper --data-dir /path/to/cache
-npx --allow-scripts=node-datachannel,ffmpeg-static,utp-native,bufferutil,utf-8-validate magnet-player-helper --ffmpeg /path/to/ffmpeg
-npx --allow-scripts=node-datachannel,ffmpeg-static,utp-native,bufferutil,utf-8-validate magnet-player-helper --auth
+npx magnet-player-helper --help
+npx magnet-player-helper --site http://localhost:5173 --no-open
+npx magnet-player-helper --port 45892
+npx magnet-player-helper --bind 0.0.0.0
+npx magnet-player-helper --data-dir /path/to/cache
+npx magnet-player-helper --ffmpeg /path/to/ffmpeg
+npx magnet-player-helper --auth
 ```
 
 | Option                | Behavior                                                                                           |
@@ -63,20 +75,21 @@ The website's Remove title / Clear library actions delete managed caches while c
 
 `http://127.0.0.1:45891` by default. There is no hosted backend.
 
-| Method and path                         | Purpose                                                                                      |
-| --------------------------------------- | -------------------------------------------------------------------------------------------- |
-| `GET /health`                           | Name, version, API version; no key required.                                                 |
-| `GET /api/pair`                         | Connection check.                                                                            |
-| `POST /api/torrents`                    | JSON `{ "magnet": "magnet:?…" }`; wait for metadata and start downloading images.            |
-| `GET /api/torrents/:hash`               | Active title, files, selection and transfer statistics.                                      |
-| `POST /api/torrents/:hash/select`       | JSON `{ "index": 0, "offset": 0 }`; select a video or audio file at a byte offset.           |
-| `POST /api/torrents/:hash/cursor`       | JSON `{ "index": 0, "offset": 1234 }`; move the download window to the playhead.             |
-| `POST /api/stop`                        | Stop transfers, preserve data.                                                               |
-| `DELETE /api/torrents/:hash`            | Delete one managed title.                                                                    |
-| `DELETE /api/library`                   | Delete managed torrent caches.                                                               |
-| `GET /media/:hash/:index/raw`           | Selected video/audio or any supported image; HEAD and byte ranges. Add `download=1` to save. |
-| `GET /media/:hash/:index/playlist.m3u8` | HLS VOD playlist for local compatibility conversion.                                         |
-| `GET /media/:hash/:index/:segment.ts`   | Cached or on-demand four-second H.264/AAC segment.                                           |
+| Method and path                         | Purpose                                                                                                                                                                                                                                                                          |
+| --------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `GET /health`                           | Name, version, API version; no key required.                                                                                                                                                                                                                                     |
+| `GET /api/pair`                         | Connection check.                                                                                                                                                                                                                                                                |
+| `GET /api/search?q=ubuntu&provider=all` | Search through the helper without changing playback. `provider` defaults to `piratebay`; supported values: `all`, `piratebay`, `torrents-csv`, `knaben`, `yts`. Returns `{ "results": [...], "limited": false, "partial": false, "warnings": [] }`, capped at 500 merged hashes. |
+| `POST /api/torrents`                    | JSON `{ "magnet": "magnet:?…" }`; wait for metadata and start downloading images.                                                                                                                                                                                                |
+| `GET /api/torrents/:hash`               | Active title, files, selection and transfer statistics.                                                                                                                                                                                                                          |
+| `POST /api/torrents/:hash/select`       | JSON `{ "index": 0, "offset": 0 }`; select a video or audio file at a byte offset.                                                                                                                                                                                               |
+| `POST /api/torrents/:hash/cursor`       | JSON `{ "index": 0, "offset": 1234 }`; move the download window to the playhead.                                                                                                                                                                                                 |
+| `POST /api/stop`                        | Stop transfers, preserve data.                                                                                                                                                                                                                                                   |
+| `DELETE /api/torrents/:hash`            | Delete one managed title.                                                                                                                                                                                                                                                        |
+| `DELETE /api/library`                   | Delete managed torrent caches.                                                                                                                                                                                                                                                   |
+| `GET /media/:hash/:index/raw`           | Selected video/audio or any supported image; HEAD and byte ranges. Add `download=1` to save.                                                                                                                                                                                     |
+| `GET /media/:hash/:index/playlist.m3u8` | HLS VOD playlist for local compatibility conversion.                                                                                                                                                                                                                             |
+| `GET /media/:hash/:index/:segment.ts`   | Cached or on-demand four-second H.264/AAC segment.                                                                                                                                                                                                                               |
 
 With `--auth`, include `Authorization: Bearer <key>` for API calls or `?token=<key>` for media. Otherwise omit credentials. Requests never accept arbitrary filesystem paths. Content stays on the visitor's machine; ordinary torrent discovery uses the magnet's trackers, DHT and peer exchange.
 
