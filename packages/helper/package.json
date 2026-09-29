@@ -1,6 +1,6 @@
 {
   "name": "magnet-player-helper",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Local torrent streaming companion for Magnet Player. Run with npx; browse and watch on your device.",
   "type": "module",
   "bin": {

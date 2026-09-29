@@ -2,12 +2,12 @@ import { createServer } from 'node:http'
 import { randomBytes } from 'node:crypto'
 import { errorMessage, errorStatus } from '../errors.js'
 import { VERSION, DEFAULT_PORT, DEFAULT_SITE } from '../config.js'
-import { TorrentEngine } from '../torrent/engine.js'
+import { TorrentEngine } from '../torrent/torrent-engine.js'
 import { Transcoder } from '../media/transcoder.js'
 import { createRequestPolicy } from './request-policy.js'
 import { sendJson } from './protocol.js'
-import { routeApi } from './api.js'
-import { routeMedia } from './media.js'
+import { routeApi } from './api-routes.js'
+import { routeMedia } from './media-routes.js'
 
 type HelperOptions = {
   root: string

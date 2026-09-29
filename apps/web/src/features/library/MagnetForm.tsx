@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import type { FormEvent } from 'react'
-import { AlertCircle, ArrowRight, Link2, LoaderCircle, X } from 'lucide-react'
+import { ArrowRight, Link2, LoaderCircle, X } from 'lucide-react'
 
 import { isMagnetLink } from '../../shared/magnet'
 
@@ -11,8 +11,6 @@ type Props = {
   busy: boolean
   connected: boolean
   compact?: boolean
-  error?: string
-  onDismiss?: () => void
 }
 
 export default function MagnetForm({
@@ -22,11 +20,10 @@ export default function MagnetForm({
   busy,
   connected,
   compact = false,
-  error,
-  onDismiss,
 }: Props) {
   const [value, setValue] = useState('')
   const valid = isMagnetLink(value)
+  const inactive = !connected && !canCancel
 
   const submit = async (event: FormEvent) => {
     event.preventDefault()
@@ -49,7 +46,7 @@ export default function MagnetForm({
             autoComplete="off"
             spellCheck="false"
             required
-            disabled={busy}
+            disabled={busy || inactive}
           />
           <button
             className="primary"
@@ -72,17 +69,6 @@ export default function MagnetForm({
           </button>
         </div>
       </form>
-      {error && (
-        <p className="error-banner" role="alert">
-          <AlertCircle size={16} />
-          <span>{error}</span>
-          {onDismiss && (
-            <button onClick={onDismiss} aria-label="Dismiss error">
-              <X size={15} />
-            </button>
-          )}
-        </p>
-      )}
     </div>
   )
 }

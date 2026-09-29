@@ -1,6 +1,6 @@
-import type { Lockfile } from './release.js'
+import type { Lockfile } from './release-utils.js'
 import { writeFileSync } from 'node:fs'
-import { readJson, repositoryRoot, validateVersion } from './release.js'
+import { readJson, repositoryRoot, validateVersion } from './release-utils.js'
 
 const version = validateVersion(process.argv[2])
 const manifest = readJson('packages/helper/package.json')

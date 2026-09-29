@@ -1,31 +1,9 @@
 import { join } from 'node:path'
-import { readOptionalFile, writeFileAtomically } from '../storage/files.js'
+import { readOptionalFile, writeFileAtomically } from '../storage/atomic-files.js'
 import { Ffmpeg } from './ffmpeg.js'
+import { segmentArguments, type SegmentOptions } from './segment-encoding.js'
 import { SEGMENT_SECONDS } from './hls.js'
-import { parseMediaMetadata, type MediaMetadata } from './probe.js'
-
-export type SegmentTrack = { kind: 'muxed' } | { kind: 'video' } | { kind: 'audio'; index: number }
-type SegmentOptions = {
-  id: string
-  fileIndex: number
-  segmentIndex: number
-  source: string
-  duration: number
-  track: SegmentTrack
-}
-const VIDEO_ENCODING = [
-  '-c:v',
-  'libx264',
-  '-preset',
-  'veryfast',
-  '-crf',
-  '23',
-  '-vf',
-  "scale='min(1920,iw)':-2",
-  '-pix_fmt',
-  'yuv420p',
-]
-const AUDIO_ENCODING = ['-c:a', 'aac', '-ac', '2', '-b:a', '128k']
+import { parseMediaMetadata, type MediaMetadata } from './media-metadata.js'
 
 export class Transcoder {
   private ffmpeg: Ffmpeg
@@ -58,7 +36,7 @@ export class Transcoder {
   }
 
   segment(options: SegmentOptions): Promise<Buffer> {
-    const { id, fileIndex, segmentIndex, source, duration, track } = options
+    const { id, fileIndex, segmentIndex, duration, track } = options
     if (this.stopping) return Promise.reject(new Error('Video conversion stopped.'))
     if (
       !Number.isSafeInteger(segmentIndex) ||
@@ -81,22 +59,7 @@ export class Transcoder {
     const target = join(directory, `${segmentIndex}.ts`)
     const pending = this.pending.get(target)
     if (pending) return pending
-    const args = [
-      '-hide_banner',
-      '-loglevel',
-      'error',
-      '-nostdin',
-      '-ss',
-      String(segmentIndex * SEGMENT_SECONDS),
-      '-i',
-      source,
-      '-t',
-      String(Math.min(SEGMENT_SECONDS, duration - segmentIndex * SEGMENT_SECONDS)),
-    ]
-    if (track.kind !== 'audio') args.push('-map', '0:v:0', ...VIDEO_ENCODING)
-    if (track.kind !== 'video')
-      args.push('-map', track.kind === 'audio' ? `0:a:${track.index}` : '0:a:0?', ...AUDIO_ENCODING)
-    args.push('-sn', '-f', 'mpegts', 'pipe:1')
+    const args = segmentArguments(options)
     const operation = this.convert(target, args, this.generation).finally(() =>
       this.pending.delete(target),
     )

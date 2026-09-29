@@ -78,11 +78,39 @@
   width: 100%;
   max-width: 448px;
   margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.home-connection {
+  display: flex;
+  justify-content: center;
+}
+.home-or {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: $muted;
+  font-size: 12px;
+}
+.home-or > span {
+  flex: 1;
+  height: 1px;
+  background: $line;
+}
+.home-search-button {
+  justify-content: center;
+  min-height: 40px;
+  font-size: 12px;
 }
 .empty-hint {
   color: $muted;
   font-size: 13px;
   padding: 28px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
 }
 
 .workspace {

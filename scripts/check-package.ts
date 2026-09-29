@@ -1,7 +1,7 @@
 import { execFileSync } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
-import { readJson, repositoryRoot, validatePackage } from './release.js'
-import type { PackageArchive } from './release.js'
+import { readJson, repositoryRoot, validatePackage } from './release-utils.js'
+import type { PackageArchive } from './release-utils.js'
 
 if (!process.env.npm_execpath) throw new Error('Run this check with npm run helper:check.')
 const output = execFileSync(

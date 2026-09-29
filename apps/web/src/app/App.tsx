@@ -1,14 +1,15 @@
-import { lazy, Suspense, useState } from 'react'
-import { Magnet, Search } from 'lucide-react'
-import OnlineSearchDialog, { searchMagnet } from '../features/library/OnlineSearchDialog'
+import { lazy, Suspense, useEffect, useState } from 'react'
+import { AlertCircle, Magnet, Search, X } from 'lucide-react'
+import TorrentSearchDialog from '../features/search/TorrentSearchDialog'
+import { searchMagnet } from '../features/search/search-results'
 import ClearLibraryDialog from '../features/library/ClearLibraryDialog'
 import PlayerPanel from '../features/player/PlayerPanel'
 import MagnetForm from '../features/library/MagnetForm'
-import Sidebar from '../features/library/Sidebar'
-import FileList from '../features/player/FileList'
+import LibrarySidebar from '../features/library/LibrarySidebar'
+import MediaFileList from '../features/player/files/MediaFileList'
 import HelperConnection from '../features/helper/HelperConnection'
-import useLibrary from '../features/library/useLibrary'
-import { useHelperStatus } from '../features/helper/useHelperStatus'
+import useLibrary from '../features/library/use-library'
+import { useHelperStatus } from '../features/helper/use-helper-status'
 import { isAudioFile } from '../shared/media'
 
 const VideoPlayer = lazy(() => import('../features/player/VideoPlayer'))
@@ -23,8 +24,26 @@ export default function App() {
   const started = library.entries.length > 0
   const MediaPlayer =
     library.selected && isAudioFile(library.selected.name) ? AudioPlayer : VideoPlayer
+
+  useEffect(() => {
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && library.opening) library.cancelOpen()
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [library.opening, library.cancelOpen])
+
   return (
     <div className={`app-shell ${started ? 'started' : 'empty'}`}>
+      {library.error && (
+        <div className="global-error" role="alert">
+          <AlertCircle size={16} />
+          <span>{library.error}</span>
+          <button onClick={library.dismissError} aria-label="Dismiss error">
+            <X size={15} />
+          </button>
+        </div>
+      )}
       <header className="site-header">
         <a href="/" className="brand" aria-label="Magnet Player home">
           <span className="brand-mark">
@@ -38,54 +57,81 @@ export default function App() {
             <span className="session-label">{library.status || 'Idle'}</span>
           </div>
         )}
-        <button className="badge search-online-button" onClick={() => setSearchOnline(true)}>
-          <Search size={14} /> Search Online
-        </button>
-        <HelperConnection connected={helper.connected} checkConnection={helper.check} />
         {started && (
-          <MagnetForm
-            compact
-            onAdd={library.open}
-            onCancel={library.cancelOpen}
-            canCancel={library.canCancel}
-            busy={library.busy}
-            connected={helper.connected}
-            error={library.error}
-            onDismiss={library.dismissError}
-          />
+          <>
+            <button
+              className="badge search-online-button"
+              onClick={() => setSearchOnline(true)}
+              disabled={!helper.connected}
+              title={helper.connected ? undefined : 'Connect the helper to search torrents.'}
+            >
+              <Search size={14} /> Search Torrents
+            </button>
+            <HelperConnection connected={helper.connected} checkConnection={helper.check} />
+            <MagnetForm
+              compact
+              onAdd={library.open}
+              onCancel={library.cancelOpen}
+              canCancel={library.canCancel}
+              busy={library.busy}
+              connected={helper.connected}
+            />
+          </>
         )}
       </header>
       {!started ? (
         <div className="empty-state">
+          <div className="home-connection">
+            <HelperConnection connected={helper.connected} checkConnection={helper.check} />
+          </div>
           <MagnetForm
             onAdd={library.open}
             onCancel={library.cancelOpen}
             canCancel={library.canCancel}
             busy={library.busy}
             connected={helper.connected}
-            error={library.error}
-            onDismiss={library.dismissError}
           />
+          <div className="home-or" aria-hidden="true">
+            <span />
+            or
+            <span />
+          </div>
+          <button
+            className="badge home-search-button"
+            onClick={() => setSearchOnline(true)}
+            disabled={!helper.connected}
+            title={helper.connected ? undefined : 'Connect the helper to search torrents.'}
+          >
+            <Search size={14} /> Search Torrents
+          </button>
         </div>
       ) : (
         <div className="workspace">
-          <Sidebar
+          <LibrarySidebar
             entries={library.entries}
             activeId={library.active?.infoHash}
             onOpen={library.open}
             onRemove={library.remove}
             onClear={() => setConfirmClear(true)}
             disabled={library.busy}
+            removeDisabled={library.busy && !library.opening}
           />
           {!library.selected && (
             <main>
-              <p className="empty-hint">
-                {library.busy
-                  ? 'Connecting to peers and fetching torrent metadata…'
-                  : library.active
-                    ? 'No video or audio files in this torrent.'
-                    : 'Pick a title or add a magnet.'}
-              </p>
+              <div className="empty-hint">
+                <p>
+                  {library.busy
+                    ? 'Connecting to peers and fetching torrent metadata…'
+                    : library.active
+                      ? 'No video or audio files in this torrent.'
+                      : 'Pick a title or add a magnet.'}
+                </p>
+                {library.opening && (
+                  <button className="badge" onClick={library.cancelOpen}>
+                    <X size={14} /> Cancel
+                  </button>
+                )}
+              </div>
             </main>
           )}
           {library.active && library.selected && (
@@ -106,7 +152,7 @@ export default function App() {
                 onPrefs={library.saveMediaPrefs}
                 autoPlay
               >
-                <FileList
+                <MediaFileList
                   key={library.active.infoHash}
                   files={library.active.files}
                   selected={library.selected}
@@ -118,7 +164,7 @@ export default function App() {
           )}
           {library.active && !library.selected && (
             <PlayerPanel>
-              <FileList
+              <MediaFileList
                 key={library.active.infoHash}
                 files={library.active.files}
                 selected={library.selected}
@@ -137,7 +183,7 @@ export default function App() {
         />
       )}
       {searchOnline && (
-        <OnlineSearchDialog
+        <TorrentSearchDialog
           entries={library.entries}
           busy={library.busy}
           onClose={() => setSearchOnline(false)}

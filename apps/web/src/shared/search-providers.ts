@@ -1,5 +1,6 @@
-export { SEARCH_PROVIDERS } from '../../../../packages/helper/src/http/search/model'
+export { SEARCH_PROVIDERS } from '../../../../packages/helper/src/contracts/search'
 export type {
   SearchResult,
   SearchProvider,
-} from '../../../../packages/helper/src/http/search/model'
+  SearchResponse,
+} from '../../../../packages/helper/src/contracts/search'

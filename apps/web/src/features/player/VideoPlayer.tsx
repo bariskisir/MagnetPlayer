@@ -1,32 +1,19 @@
 import '@videojs/react/video/skin.css'
 import { lazy, Suspense, useRef } from 'react'
-import type { ReactNode } from 'react'
 import { VideoPlayer as Player, VideoSkin, Video } from '@videojs/react/video'
-import { useSubtitles } from '../subtitles/useSubtitles'
-import { useSubtitleOverlay } from '../subtitles/useSubtitleOverlay'
+import { useSubtitles } from '../subtitles/use-subtitles'
+import { useSubtitleOverlay } from '../subtitles/use-subtitle-overlay'
 import { AudioPreferences } from './AudioPreferences'
 import { SubtitlePreferences } from './SubtitlePreferences'
 import PlayerPanel from './PlayerPanel'
-import { PausePlaybackContext } from './PlaybackContext'
-import { usePlayback } from './usePlayback'
-import type { MediaFile } from '../helper/types'
-import type { LibraryEntry, MediaPreferences } from '../library/types'
-import type { SavePreferences, SaveProgress, TransferStats } from './types'
+import { PausePlaybackContext } from './playback-context'
+import { usePlayback } from './use-playback'
+import type { MediaPreferences } from '../library/library-types'
+import type { MediaPlayerProps } from './player-types'
 
 const HlsJsVideo = lazy(async () => ({
   default: (await import('@videojs/react/media/hlsjs-video')).HlsJsVideo,
 }))
-
-type Props = {
-  id: string
-  file: MediaFile
-  entry?: LibraryEntry
-  stats: TransferStats
-  onProgress: SaveProgress
-  onPrefs: SavePreferences
-  autoPlay?: boolean
-  children?: ReactNode
-}
 
 export default function VideoPlayer({
   id,
@@ -37,13 +24,13 @@ export default function VideoPlayer({
   onPrefs,
   autoPlay = false,
   children,
-}: Props) {
+}: MediaPlayerProps) {
   const stageRef = useRef<HTMLDivElement | null>(null)
   const preferences = entry?.mediaPrefs?.[file.path]
   const savePreferences = (patch: MediaPreferences) => onPrefs(id, file.path, patch)
   const playback = usePlayback({ id, file, entry, onProgress, onPrefs, autoPlay })
   const subtitles = useSubtitles(`${id}/${file.path}`, file.name, preferences?.subtitleLanguage)
-  const overlay = useSubtitleOverlay(playback.video, stageRef, subtitles, (language) => {
+  const overlay = useSubtitleOverlay(playback.media, stageRef, subtitles, (language) => {
     subtitles.selectLanguage(language)
     savePreferences({ subtitleLanguage: language })
   })
@@ -57,7 +44,7 @@ export default function VideoPlayer({
             <Suspense fallback={null}>
               {playback.source && (
                 <Media
-                  ref={playback.attachVideo}
+                  ref={playback.attachMedia}
                   src={playback.source}
                   playsInline
                   preload="metadata"

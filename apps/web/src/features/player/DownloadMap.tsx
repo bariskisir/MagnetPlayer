@@ -1,4 +1,4 @@
-import type { ByteRange } from '../helper/types'
+import type { ByteRange } from '../helper/helper-types'
 
 type Props = {
   ranges?: ByteRange[]

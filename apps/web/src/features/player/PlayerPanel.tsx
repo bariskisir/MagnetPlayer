@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react'
 import { formatBytes } from '../../shared/format'
 import DownloadMap from './DownloadMap'
-import type { TransferStats } from './types'
+import type { TransferStats } from '../helper/helper-types'
 
 export default function PlayerPanel({
   children,

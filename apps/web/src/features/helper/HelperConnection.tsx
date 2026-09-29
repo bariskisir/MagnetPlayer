@@ -7,7 +7,7 @@ import {
   HELPER_SETUP_COMMAND,
   configureHelper,
   helperConnection,
-} from './connection'
+} from './connection-settings'
 
 export default function HelperConnection({
   connected,

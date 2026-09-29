@@ -1,17 +1,16 @@
 import type { IncomingMessage, ServerResponse } from 'node:http'
+import type { TorrentCommand } from '../contracts/torrent.js'
 
 export function sendJson(response: ServerResponse, status: number, value: unknown) {
   response.writeHead(status, { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' })
   response.end(JSON.stringify(value))
 }
 
-export async function readJsonBody(
-  request: IncomingMessage,
-): Promise<{ magnet?: string; index?: number; offset?: number }> {
+export async function readJsonBody(request: IncomingMessage): Promise<TorrentCommand> {
   if (!request.headers['content-type']?.startsWith('application/json'))
     throw Object.assign(new Error('JSON request required.'), { status: 415 })
   let size = 0
-  const chunks = []
+  const chunks: Buffer[] = []
   for await (const chunk of request) {
     size += chunk.length
     if (size > 32768) throw Object.assign(new Error('Request is too large.'), { status: 413 })
@@ -21,16 +20,13 @@ export async function readJsonBody(
     const parsed: unknown = JSON.parse(Buffer.concat(chunks).toString())
     if (typeof parsed !== 'object' || parsed === null || Array.isArray(parsed))
       throw new Error('JSON object required.')
+    const fields = parsed as Record<string, unknown>
     if ('magnet' in parsed && typeof parsed.magnet !== 'string') throw new Error('Invalid magnet.')
     for (const key of ['index', 'offset'] as const) {
-      if (
-        key in parsed &&
-        (typeof (parsed as Record<string, unknown>)[key] !== 'number' ||
-          !Number.isFinite((parsed as Record<string, number>)[key]))
-      )
+      if (key in parsed && (typeof fields[key] !== 'number' || !Number.isFinite(fields[key])))
         throw new Error('Invalid numeric field.')
     }
-    return parsed as { magnet?: string; index?: number; offset?: number }
+    return parsed as TorrentCommand
   } catch {
     throw new Error('Invalid JSON request.')
   }

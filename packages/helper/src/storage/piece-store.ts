@@ -1,6 +1,6 @@
 import { mkdir, readFile, rm } from 'node:fs/promises'
 import { join } from 'node:path'
-import { writeFileAtomically } from './files.js'
+import { writeFileAtomically } from './atomic-files.js'
 
 type StoreOptions = { root: string; length: number; torrent: { infoHash: string } }
 type StoreCallback = (error: Error | null) => void

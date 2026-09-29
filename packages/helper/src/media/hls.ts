@@ -1,4 +1,4 @@
-import type { AudioStream } from './probe.js'
+import type { AudioStream } from './media-metadata.js'
 
 export const SEGMENT_SECONDS = 4
 const languageCodes: Record<string, string> = {

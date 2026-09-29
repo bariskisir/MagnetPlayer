@@ -1,6 +1,6 @@
-import { helperRequest } from './transport'
-import { mediaUrl } from './connection'
-import type { FileSnapshot, MediaFile, TorrentSnapshot } from './types'
+import { helperRequest } from './helper-client'
+import { mediaUrl } from './connection-settings'
+import type { FileSnapshot, MediaFile, TorrentSnapshot } from './helper-types'
 
 class RemoteMediaFile implements MediaFile {
   index: number

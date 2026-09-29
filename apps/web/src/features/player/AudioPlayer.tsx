@@ -1,11 +1,8 @@
 import { Music } from 'lucide-react'
-import type { ReactNode } from 'react'
-import type { MediaFile } from '../helper/types'
-import type { LibraryEntry } from '../library/types'
-import type { SavePreferences, SaveProgress, TransferStats } from './types'
+import type { MediaPlayerProps } from './player-types'
 import PlayerPanel from './PlayerPanel'
-import { PausePlaybackContext } from './PlaybackContext'
-import { usePlayback } from './usePlayback'
+import { PausePlaybackContext } from './playback-context'
+import { usePlayback } from './use-playback'
 
 export default function AudioPlayer({
   id,
@@ -16,16 +13,7 @@ export default function AudioPlayer({
   onPrefs,
   autoPlay = false,
   children,
-}: {
-  id: string
-  file: MediaFile
-  entry?: LibraryEntry
-  stats: TransferStats
-  onProgress: SaveProgress
-  onPrefs: SavePreferences
-  autoPlay?: boolean
-  children?: ReactNode
-}) {
+}: MediaPlayerProps) {
   const playback = usePlayback<HTMLAudioElement>({ id, file, entry, onProgress, onPrefs, autoPlay })
   return (
     <>
@@ -35,7 +23,7 @@ export default function AudioPlayer({
           <h2>{file.name}</h2>
           {playback.source && (
             <audio
-              ref={playback.attachVideo}
+              ref={playback.attachMedia}
               src={playback.source}
               controls
               preload="metadata"

@@ -1,6 +1,6 @@
-import type { Lockfile } from './release.js'
+import type { Lockfile } from './release-utils.js'
 import { readFileSync } from 'node:fs'
-import { documentationFiles, readJson, repositoryRoot, validateTag } from './release.js'
+import { documentationFiles, readJson, repositoryRoot, validateTag } from './release-utils.js'
 
 const manifest = readJson('packages/helper/package.json')
 validateTag(process.env.GITHUB_REF_NAME || `v${manifest.version}`, manifest.version)
