@@ -101,8 +101,16 @@ export default function TorrentSearchDialog({
       }}
     >
       <div className="search-heading">
-        <h2 id="online-search-heading">Search Torrents</h2>
-        <button onClick={onClose} disabled={adding} aria-label="Close search">
+        <div>
+          <h2 id="online-search-heading">Find your next watch</h2>
+          <p>Search providers and add titles to your library.</p>
+        </div>
+        <button
+          className="icon-button"
+          onClick={onClose}
+          disabled={adding}
+          aria-label="Close search"
+        >
           <X size={18} />
         </button>
       </div>
@@ -118,7 +126,7 @@ export default function TorrentSearchDialog({
           type="search"
           value={query}
           maxLength={200}
-          placeholder="Search"
+          placeholder="Search for a movie, series or title…"
           aria-label="Search torrents"
           disabled={adding || searching}
           onChange={(event) => setQuery(event.target.value)}
@@ -202,13 +210,23 @@ export default function TorrentSearchDialog({
             changeSort={changeSort}
           />
         ) : (
-          <p>
-            {searching
-              ? 'Searching…'
-              : searched
-                ? 'No torrents found.'
-                : 'Results will appear here.'}
-          </p>
+          <div className="search-empty" role="status">
+            <Search size={28} aria-hidden="true" />
+            <p>
+              {searching
+                ? 'Searching…'
+                : searched
+                  ? 'No torrents found.'
+                  : 'Results will appear here.'}
+            </p>
+            {!searching && (
+              <span className="subtle">
+                {searched
+                  ? 'Try a different title or search provider.'
+                  : 'Choose a provider or search them all at once.'}
+              </span>
+            )}
+          </div>
         )}
       </div>
       {results.length > 0 && (

@@ -1,7 +1,7 @@
 import { errorMessage as describeError } from '../../shared/errors'
 import { useEffect, useRef, useState } from 'react'
 import type { FormEvent } from 'react'
-import { Check, Copy, Terminal } from 'lucide-react'
+import { Check, Copy, Terminal, X } from 'lucide-react'
 import {
   HELPER_COMMAND,
   HELPER_SETUP_COMMAND,
@@ -69,6 +69,19 @@ export default function HelperConnection({
       </button>
       {open && (
         <div className="helper-body" role="dialog" aria-label="Helper connection">
+          <div className="helper-heading">
+            <h2>Helper connection</h2>
+            <button
+              className="icon-button"
+              aria-label="Close connection settings"
+              onClick={() => setOpen(false)}
+            >
+              <X size={16} />
+            </button>
+          </div>
+          <p className="subtle">
+            Run the helper on your device and keep its terminal open while watching.
+          </p>
           <div className="helper-command">
             <p>
               <Terminal size={15} /> {HELPER_COMMAND}
@@ -123,32 +136,41 @@ export default function HelperConnection({
               }
             }}
           >
-            <input
-              type="text"
-              value={host}
-              onChange={(event) => setHost(event.target.value)}
-              placeholder="127.0.0.1"
-              aria-label="Helper host"
-              autoComplete="off"
-              spellCheck="false"
-            />
-            <input
-              type="number"
-              min="1024"
-              max="65535"
-              value={port}
-              onChange={(event) => setPort(event.target.value)}
-              aria-label="Helper port"
-              required
-            />
-            <input
-              type="password"
-              value={key}
-              onChange={(event) => setKey(event.target.value)}
-              placeholder="Key"
-              aria-label="Connection key"
-              autoComplete="off"
-            />
+            <label className="helper-host">
+              Host
+              <input
+                type="text"
+                value={host}
+                onChange={(event) => setHost(event.target.value)}
+                placeholder="127.0.0.1"
+                aria-label="Helper host"
+                autoComplete="off"
+                spellCheck="false"
+              />
+            </label>
+            <label className="helper-port">
+              Port
+              <input
+                type="number"
+                min="1024"
+                max="65535"
+                value={port}
+                onChange={(event) => setPort(event.target.value)}
+                aria-label="Helper port"
+                required
+              />
+            </label>
+            <label className="helper-key">
+              Connection key <span className="subtle">(optional)</span>
+              <input
+                type="password"
+                value={key}
+                onChange={(event) => setKey(event.target.value)}
+                placeholder="Key"
+                aria-label="Connection key"
+                autoComplete="off"
+              />
+            </label>
             <button className="primary" disabled={busy}>
               Connect
             </button>

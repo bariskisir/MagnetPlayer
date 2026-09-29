@@ -1,10 +1,12 @@
-// Application stylesheet entry point composing all style modules.
+// Shared foundations precede feature styles; responsive rules own the breakpoints.
 @use 'base';
+@use 'controls';
 @use 'layout';
 @use 'magnet-form';
-@use 'player';
-@use 'images';
 @use 'library';
+@use 'player';
+@use 'files';
+@use 'gallery';
 @use 'dialog';
 @use 'search';
 @use 'helper-connection';

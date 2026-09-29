@@ -1,0 +1,171 @@
+@use 'tokens' as *;
+
+.files-panel {
+  margin-top: 20px;
+}
+.file-list {
+  display: grid;
+  gap: 6px;
+}
+.file-row {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  gap: 10px;
+  padding: 7px 9px;
+  border-radius: 6px;
+  min-height: 34px;
+}
+.file-row:hover {
+  background: $panel;
+}
+.file-row.selected {
+  background: $selected;
+}
+.file-select {
+  display: grid;
+  grid-template-columns: 18px minmax(0, 1fr);
+  align-items: center;
+  gap: 4px 10px;
+  flex: 1;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: $text;
+  font-size: 12px;
+  text-align: left;
+  cursor: pointer;
+}
+.file-row.selected .file-select {
+  color: $text;
+}
+.file-select > svg {
+  color: $muted;
+}
+.file-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow-wrap: anywhere;
+}
+.file-save {
+  display: inline-flex;
+  flex-shrink: 0;
+  padding: 5px;
+  color: $muted;
+  border-radius: 6px;
+}
+.file-save:hover {
+  color: $accent;
+  background: $hover;
+}
+.file-meta {
+  grid-column: 2;
+  font-size: 12px;
+  color: $muted;
+  font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
+}
+.file-row .watch-progress {
+  width: 28px;
+  flex-shrink: 0;
+}
+.image-list {
+  margin-top: 20px;
+  padding: 0 8px 12px;
+}
+.audio-list {
+  margin-top: 20px;
+}
+.file-section > summary,
+.image-list > summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  color: $muted;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  list-style: none;
+}
+.file-section > summary {
+  padding-inline: 8px;
+}
+.file-section[open] > summary,
+.image-list[open] > summary {
+  margin-bottom: 8px;
+}
+.file-section > summary::-webkit-details-marker,
+.image-list > summary::-webkit-details-marker {
+  display: none;
+}
+.file-section > summary svg,
+.image-list > summary svg {
+  margin-left: auto;
+}
+.file-section[open] > summary svg,
+.image-list[open] > summary svg {
+  transform: rotate(90deg);
+}
+.file-section > summary span,
+.image-list > summary span {
+  color: $muted;
+  font-variant-numeric: tabular-nums;
+}
+.image-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px 8px;
+}
+.image-file {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 6px;
+  padding: 0;
+  text-align: left;
+}
+.image-thumbnail {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  border: 1px solid $line;
+  border-radius: 6px;
+  background: $panel;
+  color: $muted;
+}
+.image-thumbnail img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.image-file:hover .image-thumbnail {
+  border-color: $accent;
+}
+.image-download {
+  position: absolute;
+  right: 5px;
+  bottom: 5px;
+  padding: 2px 5px;
+  border-radius: 4px;
+  background: $bg;
+  color: $muted;
+  font-size: 12px;
+}
+.image-file-name {
+  overflow: hidden;
+  color: $text;
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

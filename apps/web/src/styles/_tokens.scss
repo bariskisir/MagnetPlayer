@@ -1,8 +1,19 @@
-// Shared colors, spacing and player layout tokens.
-$bg: #101216;
-$panel: #171a1f;
-$line: #2a2e35;
-$text: #eff1ec;
-$muted: #91969e;
+// Semantic palette and shared dimensions for every application surface.
+$bg: #121211;
+$panel: #1b1b19;
+$surface: #232320;
+$hover: #2c2b27;
+$line: #383731;
+$text: #f3f0e8;
+$muted: #aaa79f;
 $accent: #c8f57b;
-$radius: 16px;
+$accent-hover: #d9ffa1;
+$accent-ink: #1d2811;
+$selected: #252b1e;
+$danger: #ffb5a6;
+$danger-bg: #38241f;
+$danger-line: #795045;
+$radius: 12px;
+$radius-small: 6px;
+$shadow: 0 24px 80px rgb(0 0 0 / 35%);
+$font-heading: 'Space Grotesk', 'DM Sans', sans-serif;

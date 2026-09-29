@@ -1,15 +1,17 @@
-// Global resets, typography, application layout and shared controls.
 @use 'tokens' as *;
 
 * {
   box-sizing: border-box;
 }
 :root {
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'DM Sans', system-ui, sans-serif;
   color: $text;
   background: $bg;
   font-synthesis: none;
   color-scheme: dark;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  accent-color: $accent;
 }
 body {
   margin: 0;
@@ -30,10 +32,10 @@ button {
   cursor: pointer;
   border: 0;
   background: transparent;
-  min-height: 32px;
+  min-height: 40px;
 }
 button:disabled {
-  opacity: 0.42;
+  opacity: 0.45;
   cursor: not-allowed;
 }
 button:not(:disabled),
@@ -41,21 +43,24 @@ a {
   transition:
     color 0.18s,
     background 0.18s,
-    border-color 0.18s;
+    border-color 0.18s,
+    box-shadow 0.18s;
 }
-button:not(:disabled):hover {
+button:not(:disabled):hover,
+a:hover {
   color: $accent;
 }
 a {
   color: inherit;
   text-decoration: none;
 }
-a:hover {
-  color: $accent;
-}
 :focus-visible {
   outline: 2px solid $accent;
-  outline-offset: 2px;
+  outline-offset: 4px;
+}
+::selection {
+  background: $accent;
+  color: $accent-ink;
 }
 svg {
   flex-shrink: 0;
@@ -67,89 +72,34 @@ h3,
 p {
   margin: 0;
 }
-h2 {
-  font-family: 'Space Grotesk', sans-serif;
+h1,
+h2,
+h3 {
+  font-family: $font-heading;
 }
-
-.error-banner {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 10px 14px;
-  border: 1px solid #784532;
-  border-radius: 8px;
-  background: #35251f;
-  color: #f0c3ad;
-  font-size: 12px;
+input::placeholder {
+  color: $muted;
+  opacity: 0.8;
 }
-.error-banner > span {
-  min-width: 0;
+input,
+select {
+  color: $text;
 }
-.error-banner > button {
-  display: flex;
-  padding: 0 2px;
-  min-height: 24px;
-}
-.global-error {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-top: 12px;
-  padding: 10px 14px;
-  border: 1px solid #784532;
-  border-radius: 8px;
-  background: #35251f;
-  color: #f0c3ad;
-  font-size: 12px;
-}
-.global-error > span {
-  flex: 1;
-  min-width: 0;
-}
-.global-error > button {
-  display: flex;
-  padding: 0 2px;
-  min-height: 24px;
+input:disabled,
+select:disabled {
+  cursor: not-allowed;
 }
 .subtle {
   color: $muted;
+  font-size: 12px;
+  line-height: 1.6;
+}
+.eyebrow {
+  color: $accent;
   font-size: 11px;
-  line-height: 1.7;
-}
-.watch-progress {
-  appearance: none;
-  display: block;
-  width: 100%;
-  border: 0;
-  background: #2a3035;
-  height: 2px;
-  overflow: hidden;
-  border-radius: 2px;
-}
-.watch-progress::-webkit-progress-bar {
-  background: #2a3035;
-}
-.watch-progress::-webkit-progress-value {
-  background: $accent;
-}
-.watch-progress::-moz-progress-bar {
-  background: $accent;
-}
-.badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  font-size: 11px;
-  color: $muted;
-  padding: 5px 9px;
-  border: 1px solid $line;
-  border-radius: 6px;
-  background: #191c21;
-  cursor: pointer;
-  white-space: nowrap;
-}
-.badge:hover {
-  color: $text;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
 }
 .spin {
   animation: spin 0.9s linear infinite;

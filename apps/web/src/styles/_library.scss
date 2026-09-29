@@ -1,97 +1,111 @@
-// Library navigation and saved title presentation.
 @use 'tokens' as *;
 
 .sidebar {
-  min-width: 0;
-  min-height: 0;
-  height: 100%;
-  overflow: hidden;
   display: flex;
   flex-direction: column;
-  padding: 14px 10px 14px 0;
+  min-height: 0;
+  min-width: 0;
+  padding: 0 16px 24px 0;
   border-right: 1px solid $line;
 }
-.sidebar-head {
-  flex-shrink: 0;
+.sidebar-head,
+.player-side-head {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  font-size: 10px;
-  letter-spacing: 1.2px;
-  text-transform: uppercase;
-  color: #5d636b;
-  padding: 0 8px 10px;
+  gap: 12px;
+  flex-shrink: 0;
+  padding-bottom: 18px;
+  min-height: 42px;
 }
-.sidebar-head button {
+.sidebar-head h2,
+.player-side-head h2 {
   display: flex;
-  padding: 0 3px;
-  min-height: 22px;
-  color: #6d727a;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: -0.2px;
+}
+.sidebar-head > button {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  min-height: 36px;
+  border-radius: $radius-small;
+  color: $muted;
+}
+.sidebar-head > button:not(:disabled):hover {
+  color: $danger;
+  background: $danger-bg;
 }
 .sidebar-list {
   flex: 1;
   min-height: 0;
   display: grid;
-  gap: 2px;
   align-content: start;
+  gap: 6px;
   overflow: auto;
   overscroll-behavior: contain;
+  padding: 4px;
+  margin: -4px;
 }
 .side-item {
   display: flex;
   align-items: center;
-  border-radius: 6px;
+  border: 1px solid transparent;
+  border-radius: $radius-small;
 }
 .side-item:hover {
-  background: #191c21;
+  background: $panel;
 }
 .side-item.active {
-  background: #1b2016;
+  background: $selected;
+  border-color: #4f5e3a;
 }
 .side-open {
   flex: 1;
   min-width: 0;
   display: grid;
-  gap: 4px;
+  gap: 9px;
   text-align: left;
-  padding: 8px 4px 8px 9px;
-}
-.side-open:disabled {
-  opacity: 0.42;
+  padding: 14px 4px 14px 12px;
 }
 .side-item.active .side-open:disabled {
   opacity: 1;
   cursor: default;
 }
 .side-name {
-  font-size: 12px;
-  color: #b7bcc4;
-  overflow: hidden;
+  color: $text;
+  font-size: 13px;
+  line-height: 1.6;
   display: -webkit-box;
-  -webkit-line-clamp: 3;
-  line-clamp: 3;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
   -webkit-box-orient: vertical;
+  overflow: hidden;
   overflow-wrap: anywhere;
 }
-.side-item.active .side-name {
-  color: $text;
-}
 .side-meta {
-  font-size: 10px;
-  color: #5d636b;
+  color: $muted;
+  font-size: 11px;
   font-variant-numeric: tabular-nums;
 }
+.side-item.active .side-meta {
+  color: $accent;
+}
 .side-remove {
-  display: flex;
-  padding: 0 8px 0 4px;
-  min-height: 26px;
-  color: #4d525a;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  padding: 8px;
+  color: $muted;
   opacity: 0;
 }
 .side-item:hover .side-remove,
-.side-remove:focus-visible {
+.side-item:focus-within .side-remove {
   opacity: 1;
 }
-.side-remove:hover {
-  color: #f0a58a;
+.side-remove:not(:disabled):hover {
+  color: $danger;
 }

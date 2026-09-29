@@ -1,5 +1,5 @@
 import { parseArgs } from 'node:util'
-import { homedir } from 'node:os'
+import { tmpdir } from 'node:os'
 import { join, resolve } from 'node:path'
 import { DEFAULT_PORT, DEFAULT_SITE } from '../config.js'
 
@@ -10,7 +10,7 @@ Usage: magnet-player-helper [options]
   --site URL       Website to open and allow (default ${DEFAULT_SITE})
   --port NUMBER    Local port (default ${DEFAULT_PORT})
   --bind ADDRESS   Listen address (default 127.0.0.1; use 0.0.0.0 for other devices)
-  --data-dir PATH  Persistent data directory
+  --data-dir PATH  Data directory (default: magnet-player-helper in the system temp directory)
   --ffmpeg PATH    Override the optional bundled FFmpeg executable
   --no-open        Print the connection link without opening a browser
   --auth           Require a connection key (default: no key required)
@@ -20,19 +20,9 @@ Usage: magnet-player-helper [options]
 Keep this terminal open while watching. Ctrl+C stops transfers and preserves data.
 `
 
-function defaultDataDirectory() {
-  if (process.platform === 'win32')
-    return join(process.env.LOCALAPPDATA || homedir(), 'MagnetPlayerHelper')
-  if (process.platform === 'darwin')
-    return join(homedir(), 'Library', 'Application Support', 'MagnetPlayerHelper')
-  return join(
-    process.env.XDG_DATA_HOME || join(homedir(), '.local', 'share'),
-    'magnet-player-helper',
-  )
-}
-
-export function parseOptions() {
+export function parseOptions(args = process.argv.slice(2)) {
   const { values } = parseArgs({
+    args,
     options: {
       site: { type: 'string', default: DEFAULT_SITE },
       port: { type: 'string', default: String(DEFAULT_PORT) },
@@ -61,7 +51,7 @@ export function parseOptions() {
     site,
     port,
     bind,
-    dataDirectory: resolve(values['data-dir'] || defaultDataDirectory()),
+    dataDirectory: resolve(values['data-dir'] || join(tmpdir(), 'magnet-player-helper')),
     ffmpeg: values.ffmpeg,
     openBrowser: !values['no-open'],
     noAuth: !values.auth,

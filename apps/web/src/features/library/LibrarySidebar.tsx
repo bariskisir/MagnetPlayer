@@ -24,7 +24,9 @@ export default function LibrarySidebar({
   return (
     <aside className="sidebar" aria-label="Library">
       <div className="sidebar-head">
-        <span>Library</span>
+        <h2>
+          Library <span className="item-count">{entries.length}</span>
+        </h2>
         <button
           onClick={onClear}
           disabled={disabled || !entries.length}

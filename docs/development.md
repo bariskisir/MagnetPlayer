@@ -7,7 +7,7 @@ npm ci
 npm run dev
 ```
 
-Open http://localhost:5173. The helper listens at http://127.0.0.1:45891 and keeps its development cache in `.helper-data/`. On PowerShell installations with restricted script execution, use `npm.cmd`.
+Open http://localhost:5173. The helper listens at http://127.0.0.1:45891 and stores its cache in the `magnet-player-helper` subfolder of the operating system's temporary directory, including during development. Pass `--data-dir` to choose a different location. On PowerShell installations with restricted script execution, use `npm.cmd`.
 
 ## Structure
 
@@ -42,6 +42,8 @@ docs/                       User, development and release guides
 The browser communicates with the helper through an HTTP transport. A torrent session owns polling and request cancellation; React hooks manage its lifetime and selected file. Library entries and per-file preferences are stored in IndexedDB. Subtitle lookup reuses cached WebVTT tracks before contacting the public catalog and subtitle services.
 
 Components use PascalCase filenames; hooks and other TypeScript modules use kebab-case. Feature-specific types and persistence modules include their domain in the filename. The helper owns the shared wire contracts in `src/contracts/`; these modules have no Node.js dependencies, and the web app imports them through its shared media/search modules and helper types. Keep server implementations out of browser imports. Byte ranges have an exclusive end, while torrent piece ranges include both endpoints.
+
+Styles are composed through `styles/main.scss`. The shared palette and dimensions live in `_tokens.scss`, reusable controls in `_controls.scss`, file browsing in `_files.scss`, and the image viewer in `_gallery.scss`. `_responsive.scss` owns the layout breakpoints. The green accent and magnet logo are shared across the start screen and playback workspace.
 
 Search request cancellation lives in `use-torrent-search.ts`, result sorting and magnet creation in `search-results.ts`, and table rendering in `SearchResultsTable.tsx`. Library entry transformations and subtitle formatting are pure functions. The audio and video players share media props and playback lifecycle, and their file sections share the same presentation component.
 

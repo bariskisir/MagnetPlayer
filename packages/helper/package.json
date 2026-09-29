@@ -1,6 +1,6 @@
 {
   "name": "magnet-player-helper",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "description": "Local torrent streaming companion for Magnet Player. Run with npx; browse and watch on your device.",
   "type": "module",
   "bin": {
@@ -30,7 +30,7 @@
     "registry": "https://registry.npmjs.org"
   },
   "scripts": {
-    "dev": "node --watch --import tsx src/cli.ts --site http://localhost:5173 --no-open --data-dir ../../.helper-data",
+    "dev": "node --watch --import tsx src/cli.ts --site http://localhost:5173 --no-open",
     "start": "node dist/cli.js",
     "prepublishOnly": "npm run build",
     "build": "tsx tools/build.ts",

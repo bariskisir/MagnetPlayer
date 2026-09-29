@@ -21,6 +21,8 @@ npm 12 blocks dependency install scripts by default; the longer command permits 
 Keep the terminal open while watching. The helper opens the website automatically.
 Downloaded pieces stay on your computer. Compatibility playback uses optional local FFmpeg.
 
+By default, the helper stores its cache in `magnet-player-helper` under the system temporary directory on Windows, macOS and Linux. The operating system may clean up temporary files. Use `--data-dir /path/to/cache` to choose a persistent location.
+
 ```sh
 npx magnet-player-helper --help
 ```

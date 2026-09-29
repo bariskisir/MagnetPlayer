@@ -1,5 +1,5 @@
 import { lazy, Suspense, useEffect, useState } from 'react'
-import { AlertCircle, Magnet, Search, X } from 'lucide-react'
+import { AlertCircle, ExternalLink, Magnet, Play, Search, X } from 'lucide-react'
 import TorrentSearchDialog from '../features/search/TorrentSearchDialog'
 import { searchMagnet } from '../features/search/search-results'
 import ClearLibraryDialog from '../features/library/ClearLibraryDialog'
@@ -57,54 +57,111 @@ export default function App() {
             <span className="session-label">{library.status || 'Idle'}</span>
           </div>
         )}
-        {started && (
-          <>
-            <button
-              className="badge search-online-button"
-              onClick={() => setSearchOnline(true)}
-              disabled={!helper.connected}
-              title={helper.connected ? undefined : 'Connect the helper to search torrents.'}
-            >
-              <Search size={14} /> Search Torrents
-            </button>
-            <HelperConnection connected={helper.connected} checkConnection={helper.check} />
+        <div className="header-actions">
+          {started && (
+            <>
+              <button
+                className="badge search-online-button"
+                onClick={() => setSearchOnline(true)}
+                disabled={!helper.connected}
+                title={helper.connected ? undefined : 'Connect the helper to search torrents.'}
+              >
+                <Search size={14} /> Search Torrents
+              </button>
+              <MagnetForm
+                compact
+                onAdd={library.open}
+                onCancel={library.cancelOpen}
+                canCancel={library.canCancel}
+                busy={library.busy}
+                connected={helper.connected}
+              />
+            </>
+          )}
+          <HelperConnection connected={helper.connected} checkConnection={helper.check} />
+        </div>
+      </header>
+      {!started ? (
+        <main className="empty-state">
+          <div className="welcome-heading">
+            <span className="eyebrow">Your media. Your space.</span>
+            <h1>
+              Your next watch.
+              <br />
+              <span>One link away.</span>
+            </h1>
+            <p>
+              Stream a title as it downloads. Keep your library, save your place, and come back for
+              more.
+            </p>
+            <ol className="welcome-steps">
+              <li>
+                <span>01</span>Connect your helper
+              </li>
+              <li>
+                <span>02</span>Add a magnet or search
+              </li>
+              <li>
+                <span>03</span>Make yourself comfortable
+              </li>
+            </ol>
+          </div>
+          <section className="start-panel" aria-label="Start watching">
+            <div className="start-panel-heading">
+              <span className="start-icon" aria-hidden="true">
+                <Play size={22} />
+              </span>
+              <h2>Let’s press play.</h2>
+              <p>Paste a magnet link to add it to your library.</p>
+            </div>
             <MagnetForm
-              compact
               onAdd={library.open}
               onCancel={library.cancelOpen}
               canCancel={library.canCancel}
               busy={library.busy}
               connected={helper.connected}
             />
-          </>
-        )}
-      </header>
-      {!started ? (
-        <div className="empty-state">
-          <div className="home-connection">
-            <HelperConnection connected={helper.connected} checkConnection={helper.check} />
+            <div className="home-or" aria-hidden="true">
+              <span />
+              or find something to watch
+              <span />
+            </div>
+            <button
+              className="badge home-search-button"
+              onClick={() => setSearchOnline(true)}
+              disabled={!helper.connected}
+              title={helper.connected ? undefined : 'Connect the helper to search torrents.'}
+            >
+              <Search size={16} /> Search torrents
+            </button>
+            <p className="connection-note" role="status">
+              <span className={`live-dot ${helper.connected ? '' : 'off'}`} />
+              {helper.connected
+                ? 'Helper connected. Ready when you are.'
+                : 'Connect the helper using the Offline button above to get started.'}
+            </p>
+          </section>
+          <div className="home-footer">
+            <span>Video · Audio · Images</span>
+            <nav className="project-links" aria-label="Project links">
+              <a
+                href="https://github.com/bariskisir/MagnetPlayer"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                GitHub <ExternalLink size={12} aria-hidden="true" />
+              </a>
+              <a
+                href="https://www.npmjs.com/package/magnet-player-helper"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                npm <ExternalLink size={12} aria-hidden="true" />
+              </a>
+            </nav>
+            <span>Your library stays on this device.</span>
           </div>
-          <MagnetForm
-            onAdd={library.open}
-            onCancel={library.cancelOpen}
-            canCancel={library.canCancel}
-            busy={library.busy}
-            connected={helper.connected}
-          />
-          <div className="home-or" aria-hidden="true">
-            <span />
-            or
-            <span />
-          </div>
-          <button
-            className="badge home-search-button"
-            onClick={() => setSearchOnline(true)}
-            disabled={!helper.connected}
-            title={helper.connected ? undefined : 'Connect the helper to search torrents.'}
-          >
-            <Search size={14} /> Search Torrents
-          </button>
-        </div>
+        </main>
       ) : (
         <div className="workspace">
           <LibrarySidebar
@@ -117,8 +174,18 @@ export default function App() {
             removeDisabled={library.busy && !library.opening}
           />
           {!library.selected && (
-            <main>
+            <main className="workspace-empty">
               <div className="empty-hint">
+                <span className="welcome-icon" aria-hidden="true">
+                  <Play size={24} />
+                </span>
+                <h1>
+                  {library.busy
+                    ? 'Getting things ready'
+                    : library.active
+                      ? 'Explore your files'
+                      : 'Ready when you are'}
+                </h1>
                 <p>
                   {library.busy
                     ? 'Connecting to peers and fetching torrent metadata…'
