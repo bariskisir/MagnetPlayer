@@ -46,6 +46,7 @@ export default function LibrarySidebar({
             <div className={`side-item ${entry.id === activeId ? 'active' : ''}`} key={entry.id}>
               <button
                 className="side-open"
+                title={entry.name}
                 onClick={() => onOpen(entry.magnet, entry)}
                 disabled={disabled || entry.id === activeId}
                 aria-current={entry.id === activeId ? 'true' : undefined}

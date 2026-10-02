@@ -8,6 +8,7 @@ import { useTorrentSession } from '../helper/use-torrent-session'
 import { clearLibrary, deleteEntry, readLibrary, saveEntry, saveEntries } from './library-storage'
 import type { LibraryEntry, MediaPreferences } from './library-types'
 import type { MediaFile } from '../helper/helper-types'
+import { MAX_TORRENT_FILE_SIZE } from '../../../../../packages/helper/src/contracts/torrent'
 
 const STORAGE_ERROR =
   'Could not save to browser storage. Check available space and site storage permissions.'
@@ -59,7 +60,7 @@ export default function useLibrary() {
   }, [updateEntries])
 
   const open = useCallback(
-    async (input: string, saved?: LibraryEntry): Promise<boolean> => {
+    async (input: string | File, saved?: LibraryEntry): Promise<boolean> => {
       if (locked.current) return false
       locked.current = true
       setBusy(true)
@@ -71,8 +72,14 @@ export default function useLibrary() {
       try {
         if (!initialized.current)
           throw new Error('Browser storage is still loading. Please try again.')
-        const magnet = parseMagnetLink(input)
-        const torrent = await openSession(magnet)
+        if (typeof input !== 'string') {
+          if (!/\.torrent$/i.test(input.name)) throw new Error('Choose a .torrent file.')
+          if (!input.size) throw new Error('The .torrent file is empty.')
+          if (input.size > MAX_TORRENT_FILE_SIZE)
+            throw new Error('The .torrent file must be 10 MB or smaller.')
+        }
+        const source = typeof input === 'string' ? parseMagnetLink(input) : input
+        const torrent = await openSession(source)
         if (!torrent) return false
         const existing = records.current.find((entry) => entry.id === torrent.infoHash)
         const videos = torrent.files.filter((file) => isVideoFile(file.name))
@@ -80,7 +87,7 @@ export default function useLibrary() {
         persist({
           id: torrent.infoHash,
           name: torrent.name,
-          magnet,
+          magnet: typeof source === 'string' ? source : parseMagnetLink(torrent.magnet),
           videos: videos.map(({ name, path, length }) => ({ name, path, length })),
           lastFile: existing?.lastFile,
           progress: existing?.progress ?? {},

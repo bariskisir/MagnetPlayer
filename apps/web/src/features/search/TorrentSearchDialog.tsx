@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { ChevronLeft, ChevronRight, Search, X } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Info, Search, X } from 'lucide-react'
 import { errorMessage } from '../../shared/errors'
 import { sortSearchResults, type SearchSortKey } from './search-results'
 import { useTorrentSearch } from './use-torrent-search'
@@ -92,7 +92,7 @@ export default function TorrentSearchDialog({
     <dialog
       ref={dialog}
       className="dialog online-search"
-      aria-labelledby="online-search-heading"
+      aria-label="Search torrents"
       onCancel={(event) => {
         event.preventDefault()
         if (adding) return
@@ -100,20 +100,6 @@ export default function TorrentSearchDialog({
         else onClose()
       }}
     >
-      <div className="search-heading">
-        <div>
-          <h2 id="online-search-heading">Find your next watch</h2>
-          <p>Search providers and add titles to your library.</p>
-        </div>
-        <button
-          className="icon-button"
-          onClick={onClose}
-          disabled={adding}
-          aria-label="Close search"
-        >
-          <X size={18} />
-        </button>
-      </div>
       <form
         className="online-search-form"
         onSubmit={(event) => {
@@ -176,25 +162,20 @@ export default function TorrentSearchDialog({
             </>
           )}
         </button>
+        <button
+          type="button"
+          className="icon-button"
+          onClick={onClose}
+          disabled={adding}
+          aria-label="Close search"
+        >
+          <X size={18} />
+        </button>
       </form>
-      <div className="search-toolbar">
-        <span role="status">
-          {searching
-            ? `Searching ${provider === 'all' ? 'all providers' : providerName}…`
-            : searched
-              ? `${results.length} results`
-              : 'Search for torrents, then select titles to add.'}
-        </span>
-      </div>
       {error && (
         <div className="error-banner" role="alert">
           {error}
         </div>
-      )}
-      {notice && (
-        <span className="subtle" role="status">
-          {notice}
-        </span>
       )}
       <div ref={resultsPanel} className="search-results" aria-busy={searching}>
         {results.length > 0 ? (
@@ -214,7 +195,7 @@ export default function TorrentSearchDialog({
             <Search size={28} aria-hidden="true" />
             <p>
               {searching
-                ? 'Searching…'
+                ? `Searching ${provider === 'all' ? 'all providers' : providerName}…`
                 : searched
                   ? 'No torrents found.'
                   : 'Results will appear here.'}
@@ -229,57 +210,71 @@ export default function TorrentSearchDialog({
           </div>
         )}
       </div>
-      {results.length > 0 && (
-        <nav className="search-pagination" aria-label="Search result pages">
-          <span>
-            {(page - 1) * PAGE_SIZE + 1}–{Math.min(page * PAGE_SIZE, results.length)} of{' '}
-            {results.length}
-          </span>
-          <button
-            disabled={page <= 1 || adding}
-            onClick={() => setPage(page - 1)}
-            aria-label="Previous results page"
-          >
-            <ChevronLeft size={16} />
-          </button>
-          <label>
-            Page{' '}
-            <select
-              aria-label="Results page"
-              value={page}
-              disabled={adding}
-              onChange={(event) => setPage(Number(event.target.value))}
-            >
-              {Array.from({ length: pages }, (_, index) => (
-                <option key={index} value={index + 1}>
-                  {index + 1}
-                </option>
-              ))}
-            </select>{' '}
-            of {pages}
-          </label>
-          <button
-            disabled={page >= pages || adding}
-            onClick={() => setPage(page + 1)}
-            aria-label="Next results page"
-          >
-            <ChevronRight size={16} />
-          </button>
-        </nav>
-      )}
       <div className="search-footer">
-        <span>{chosen.length} selected</span>
-        <button onClick={onClose} disabled={adding}>
-          Cancel
-        </button>
-        <button
-          className="primary"
-          disabled={!chosen.length || adding || busy || searching}
-          onClick={() => void add()}
-        >
-          {adding ? 'Adding…' : 'Add'}
-          {!adding && chosen.length > 0 ? ` (${chosen.length})` : ''}
-        </button>
+        <div className="search-summary">
+          {results.length > 0 && (
+            <span role="status">
+              {(page - 1) * PAGE_SIZE + 1}–{Math.min(page * PAGE_SIZE, results.length)} of{' '}
+              {results.length}
+            </span>
+          )}
+          {notice && (
+            <details className="search-notice">
+              <summary aria-label="Search information" title={notice}>
+                <Info size={16} aria-hidden="true" />
+              </summary>
+              <p>{notice}</p>
+            </details>
+          )}
+        </div>
+        {pages > 1 && (
+          <nav className="search-pagination" aria-label="Search result pages">
+            <button
+              disabled={page <= 1 || adding}
+              onClick={() => setPage(page - 1)}
+              aria-label="Previous results page"
+            >
+              <ChevronLeft size={16} />
+            </button>
+            <label>
+              Page{' '}
+              <select
+                aria-label="Results page"
+                value={page}
+                disabled={adding}
+                onChange={(event) => setPage(Number(event.target.value))}
+              >
+                {Array.from({ length: pages }, (_, index) => (
+                  <option key={index} value={index + 1}>
+                    {index + 1}
+                  </option>
+                ))}
+              </select>{' '}
+              of {pages}
+            </label>
+            <button
+              disabled={page >= pages || adding}
+              onClick={() => setPage(page + 1)}
+              aria-label="Next results page"
+            >
+              <ChevronRight size={16} />
+            </button>
+          </nav>
+        )}
+        <div className="search-actions">
+          <span>{chosen.length} selected</span>
+          <button onClick={onClose} disabled={adding}>
+            Cancel
+          </button>
+          <button
+            className="primary"
+            disabled={!chosen.length || adding || busy || searching}
+            onClick={() => void add()}
+          >
+            {adding ? 'Adding…' : 'Add'}
+            {!adding && chosen.length > 0 ? ` (${chosen.length})` : ''}
+          </button>
+        </div>
       </div>
     </dialog>
   )

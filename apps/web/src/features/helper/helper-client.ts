@@ -1,10 +1,16 @@
 import { HELPER_COMMAND, helperBaseUrl, helperConnection } from './connection-settings'
 
-type RequestOptions = { method?: string; data?: unknown; signal?: AbortSignal; timeout?: number }
+type RequestOptions = {
+  method?: string
+  data?: unknown
+  file?: File
+  signal?: AbortSignal
+  timeout?: number
+}
 
 export async function helperRequest<T = Record<string, never>>(
   path: string,
-  { method = 'GET', data, signal, timeout = 40000 }: RequestOptions = {},
+  { method = 'GET', data, file, signal, timeout = 40000 }: RequestOptions = {},
 ): Promise<T> {
   const connection = helperConnection()
   let response: Response
@@ -13,9 +19,13 @@ export async function helperRequest<T = Record<string, never>>(
       method,
       headers: {
         ...(connection.token ? { Authorization: `Bearer ${connection.token}` } : {}),
-        ...(data ? { 'Content-Type': 'application/json' } : {}),
+        ...(file
+          ? { 'Content-Type': 'application/x-bittorrent' }
+          : data
+            ? { 'Content-Type': 'application/json' }
+            : {}),
       },
-      ...(data ? { body: JSON.stringify(data) } : {}),
+      ...(file ? { body: file } : data ? { body: JSON.stringify(data) } : {}),
       signal: signal
         ? AbortSignal.any([signal, AbortSignal.timeout(timeout)])
         : AbortSignal.timeout(timeout),

@@ -80,7 +80,11 @@ export default function HelperConnection({
             </button>
           </div>
           <p className="subtle">
-            Run the helper on your device and keep its terminal open while watching.
+            Install{' '}
+            <a href="https://nodejs.org/en/download" target="_blank" rel="noopener noreferrer">
+              Node.js (LTS)
+            </a>{' '}
+            first. Then run the command below and keep its terminal open while watching.
           </p>
           <div className="helper-command">
             <p>

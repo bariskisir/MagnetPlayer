@@ -85,7 +85,7 @@ export default function SearchResultsTable({
                 }
               />
             </td>
-            <td className="search-name">
+            <td className="search-name" title={result.name}>
               {result.name}
               {known.has(result.infoHash) && <span className="subtle">Already in library</span>}
             </td>

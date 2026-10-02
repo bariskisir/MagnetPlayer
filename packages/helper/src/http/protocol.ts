@@ -1,23 +1,36 @@
 import type { IncomingMessage, ServerResponse } from 'node:http'
-import type { TorrentCommand } from '../contracts/torrent.js'
+import { MAX_TORRENT_FILE_SIZE, type TorrentCommand } from '../contracts/torrent.js'
 
 export function sendJson(response: ServerResponse, status: number, value: unknown) {
   response.writeHead(status, { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' })
   response.end(JSON.stringify(value))
 }
 
-export async function readJsonBody(request: IncomingMessage): Promise<TorrentCommand> {
-  if (!request.headers['content-type']?.startsWith('application/json'))
-    throw Object.assign(new Error('JSON request required.'), { status: 415 })
+async function readBody(request: IncomingMessage, limit: number): Promise<Buffer> {
+  if (Number(request.headers['content-length']) > limit)
+    throw Object.assign(new Error('Request is too large.'), { status: 413 })
   let size = 0
   const chunks: Buffer[] = []
   for await (const chunk of request) {
     size += chunk.length
-    if (size > 32768) throw Object.assign(new Error('Request is too large.'), { status: 413 })
+    if (size > limit) throw Object.assign(new Error('Request is too large.'), { status: 413 })
     chunks.push(chunk)
   }
+  return Buffer.concat(chunks)
+}
+
+export async function readTorrentBody(request: IncomingMessage): Promise<Buffer> {
+  const data = await readBody(request, MAX_TORRENT_FILE_SIZE)
+  if (!data.length) throw new Error('The .torrent file is empty.')
+  return data
+}
+
+export async function readJsonBody(request: IncomingMessage): Promise<TorrentCommand> {
+  if (!request.headers['content-type']?.startsWith('application/json'))
+    throw Object.assign(new Error('JSON request required.'), { status: 415 })
+  const data = await readBody(request, 32768)
   try {
-    const parsed: unknown = JSON.parse(Buffer.concat(chunks).toString())
+    const parsed: unknown = JSON.parse(data.toString())
     if (typeof parsed !== 'object' || parsed === null || Array.isArray(parsed))
       throw new Error('JSON object required.')
     const fields = parsed as Record<string, unknown>

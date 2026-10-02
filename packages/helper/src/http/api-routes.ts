@@ -1,7 +1,7 @@
 import type { IncomingMessage, ServerResponse } from 'node:http'
 import type { TorrentEngine } from '../torrent/torrent-engine.js'
 import type { Transcoder } from '../media/transcoder.js'
-import { readJsonBody, sendJson } from './protocol.js'
+import { readJsonBody, readTorrentBody, sendJson } from './protocol.js'
 import { searchProviders } from '../search/search-service.js'
 
 export async function routeApi(
@@ -29,9 +29,13 @@ export async function routeApi(
       response.removeListener('close', cancel)
     }
   } else if (pathname === '/api/torrents' && method === 'POST') {
-    const { magnet } = await readJsonBody(request)
+    const contentType = request.headers['content-type']?.split(';')[0].trim().toLowerCase()
+    const input =
+      contentType === 'application/x-bittorrent'
+        ? await readTorrentBody(request)
+        : ((await readJsonBody(request)).magnet ?? '')
     await transcoder.stop()
-    result = await engine.open(magnet ?? '')
+    result = await engine.open(input)
   } else if (pathname === '/api/stop' && method === 'POST') {
     await transcoder.stop()
     await engine.stop()

@@ -4,7 +4,7 @@ import type { TorrentFile, TorrentOptions } from 'webtorrent'
 import type { RuntimeTorrent, PieceRange } from './torrent-types.js'
 import { isTorrentId, type TorrentSnapshot } from '../contracts/torrent.js'
 import { isVideoFile, isAudioFile, isImageFile } from '../contracts/media.js'
-import parseTorrent from 'parse-torrent'
+import { parseTorrentInput } from './torrent-input.js'
 import { mkdir, rm, readdir } from 'node:fs/promises'
 import { join } from 'node:path'
 import { readOptionalFile, writeFileAtomically } from '../storage/atomic-files.js'
@@ -45,39 +45,39 @@ export class TorrentEngine {
     this.epoch = 0
   }
 
-  open(magnet: string): Promise<TorrentSnapshot> {
+  open(input: string | Buffer): Promise<TorrentSnapshot> {
     if (this.pending)
       return Promise.reject(
         Object.assign(new Error('Another torrent is opening. Try again shortly.'), { status: 409 }),
       )
     this.pending = true
     const epoch = ++this.epoch
-    this.operation = this.openTorrent(magnet, epoch).finally(() => {
+    this.operation = this.openTorrent(input, epoch).finally(() => {
       this.pending = false
     })
     return this.operation
   }
 
-  private async openTorrent(magnet: string, epoch: number): Promise<TorrentSnapshot> {
+  private async openTorrent(input: string | Buffer, epoch: number): Promise<TorrentSnapshot> {
     const check = () => {
       if (epoch !== this.epoch) throw new Error('Torrent session stopped.')
     }
     let torrent: RuntimeTorrent | undefined
     try {
-      if (typeof magnet !== 'string' || magnet.length > 16384 || !magnet.startsWith('magnet:?'))
-        throw new Error('A valid magnet link is required.')
-      const parsed = await parseTorrent(magnet)
+      const parsed = await parseTorrentInput(input)
       check()
-      if (!isTorrentId(parsed.infoHash)) throw new Error('A BitTorrent v1 hash is required.')
       if (this.active?.infoHash === parsed.infoHash && this.active.ready) return this.snapshot()
       await this.stopActive()
       check()
       this.error = ''
       const directory = join(this.root, parsed.infoHash)
       await mkdir(directory, { recursive: true })
-      const metadata = await readOptionalFile(join(directory, 'metadata.torrent'))
+      const metadata =
+        typeof input === 'string'
+          ? await readOptionalFile(join(directory, 'metadata.torrent'))
+          : input
       check()
-      torrent = this.client.add(metadata || magnet, {
+      torrent = this.client.add(metadata || input, {
         // Upstream types describe a factory; WebTorrent constructs chunk stores with new.
         store: DiskPieceStore as unknown as TorrentOptions['store'],
         storeOpts: { root: this.root },
@@ -143,6 +143,7 @@ export class TorrentEngine {
     const torrent = this.active
     return {
       infoHash: torrent.infoHash,
+      magnet: torrent.magnetURI,
       name: torrent.name,
       error: this.error,
       files: torrent.files.map((file, index) => {

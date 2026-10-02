@@ -1,6 +1,8 @@
 /** Byte ranges use an inclusive start and an exclusive end. */
 export type ByteRange = [start: number, end: number]
 
+export const MAX_TORRENT_FILE_SIZE = 10 * 1024 * 1024
+
 export interface FileSnapshot {
   index: number
   name: string
@@ -14,6 +16,7 @@ export interface FileSnapshot {
 
 export interface TorrentSnapshot {
   infoHash: string
+  magnet?: string
   name: string
   error: string
   files: FileSnapshot[]

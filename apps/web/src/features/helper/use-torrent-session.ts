@@ -40,14 +40,14 @@ export function useTorrentSession(onError: (message: string) => void) {
   }, [reset])
 
   const open = useCallback(
-    async (magnet: string) => {
+    async (input: string | File) => {
       reset()
       const controller = new AbortController()
       pending.current = controller
       try {
         await helperRequest('/api/stop', { method: 'POST', signal: controller.signal })
         controller.signal.throwIfAborted()
-        const session = await openTorrentSession(magnet, controller)
+        const session = await openTorrentSession(input, controller)
         if (controller.signal.aborted) {
           session.dispose()
           return null

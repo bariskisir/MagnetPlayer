@@ -16,7 +16,7 @@
   <a href="https://web-magnet-player.vercel.app">https://web-magnet-player.vercel.app</a>
 </p>
 
-Check your npm version with `npm --version`, then run the matching command.
+Install [Node.js (LTS)](https://nodejs.org/en/download) first. Then open a terminal, check your npm version with `npm --version`, and run the matching command.
 
 **npm 11:**
 

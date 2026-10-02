@@ -154,10 +154,15 @@
   flex: 1;
   background: $line;
 }
-.home-search-button {
-  width: 100%;
+.home-torrent-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.home-torrent-actions > .badge {
+  flex: 1 1 140px;
   min-height: 48px;
-  font-size: 13px;
+  font-size: 12px;
   background: $surface;
 }
 .connection-note {
@@ -203,10 +208,10 @@
   min-height: 0;
   min-width: 0;
   display: grid;
-  grid-template-columns: 240px minmax(0, 1fr) 292px;
+  grid-template-columns: 220px minmax(0, 1fr) 240px;
   grid-template-rows: minmax(0, 1fr);
-  gap: 24px;
-  padding-top: 24px;
+  gap: 16px;
+  padding-top: 16px;
 }
 .sidebar {
   grid-column: 1;

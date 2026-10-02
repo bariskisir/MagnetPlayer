@@ -1,7 +1,7 @@
 {
   "name": "magnet-player-repository",
   "private": true,
-  "version": "1.3.0",
+  "version": "1.4.0",
   "type": "module",
   "workspaces": [
     "apps/web",
@@ -32,7 +32,7 @@
     "prettier": "^3.9.9",
     "concurrently": "^10.0.5",
     "tsx": "^4.23.15",
-    "@types/node": "^26.6.3",
+    "@types/node": "^26.6.4",
     "typescript": "^7.0.2"
   },
   "allowScripts": {

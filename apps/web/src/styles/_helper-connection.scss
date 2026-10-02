@@ -7,14 +7,14 @@
 .helper-body {
   position: absolute;
   right: 0;
-  top: calc(100% + 12px);
+  top: calc(100% + 8px);
   z-index: 20;
-  width: min(400px, calc(100vw - 32px));
-  max-height: calc(100dvh - 110px);
+  width: min(380px, calc(100vw - 32px));
+  max-height: calc(100dvh - 88px);
   overflow-y: auto;
-  padding: 24px;
+  padding: 16px;
   display: grid;
-  gap: 16px;
+  gap: 10px;
   border: 1px solid $line;
   border-radius: $radius;
   background: $panel;
@@ -27,15 +27,25 @@
   gap: 12px;
 }
 .helper-heading h2 {
-  font-size: 17px;
+  font-size: 16px;
   font-weight: 500;
   letter-spacing: -0.4px;
+}
+.helper-heading .icon-button {
+  width: 32px;
+  min-height: 32px;
+  padding: 6px;
+}
+.helper-body a {
+  color: $accent;
+  text-decoration: underline;
+  text-underline-offset: 2px;
 }
 .helper-command {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 10px;
+  padding: 8px;
   background: $bg;
   border: 1px solid $line;
   border-radius: $radius-small;
@@ -77,13 +87,13 @@
 }
 .helper-setup[open] > p,
 .helper-setup[open] > .helper-command {
-  margin-top: 12px;
+  margin-top: 8px;
 }
 .helper-body form {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 96px;
-  gap: 14px 10px;
-  padding-top: 8px;
+  grid-template-columns: minmax(0, 1fr) 88px;
+  gap: 10px;
+  padding-top: 4px;
 }
 .helper-body label {
   display: block;
@@ -91,17 +101,21 @@
   font-size: 12px;
   color: $muted;
 }
-.helper-key,
+.helper-key {
+  grid-column: 1;
+}
 .helper-body form > button {
-  grid-column: 1 / -1;
+  align-self: end;
+  min-height: 36px;
+  padding: 8px 12px;
 }
 .helper-body input {
   display: block;
-  margin-top: 6px;
+  margin-top: 4px;
   width: 100%;
   min-width: 0;
-  height: 42px;
-  padding: 10px 12px;
+  height: 36px;
+  padding: 8px 10px;
   border: 1px solid $line;
   border-radius: $radius-small;
   background: $bg;

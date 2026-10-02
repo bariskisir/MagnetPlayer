@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import { ChevronRight } from 'lucide-react'
 import { formatBytes } from '../../shared/format'
 import DownloadMap from './DownloadMap'
 import type { TransferStats } from '../helper/helper-types'
@@ -18,27 +19,26 @@ export default function PlayerPanel({
 }) {
   return (
     <aside className="player-side" aria-label="Player panel">
-      <div className="player-side-head">
-        <h2>Now playing</h2>
-      </div>
       {subtitleNote && (
         <span className="subtitle-note" role="status">
           {subtitleNote}
         </span>
       )}
       {stats && length !== undefined && (
-        <>
-          <div className="transfer-panel">
-            <div className="transfer-heading">
-              <span>{message || 'Downloading'}</span>
-              <strong>{Math.round(stats.progress * 100)}%</strong>
-            </div>
+        <details className="transfer-panel">
+          <summary aria-label="Download details">
+            <span className="transfer-heading">{message || 'Downloading'}</span>
             <DownloadMap
               ranges={stats.ranges}
               length={length}
               progress={stats.progress}
               cursor={stats.cursor}
             />
+            <span>↓ {formatBytes(stats.speed)}/s</span>
+            <strong>{Math.round(stats.progress * 100)}%</strong>
+            <ChevronRight size={14} className="transfer-toggle" aria-hidden="true" />
+          </summary>
+          <div className="transfer-details">
             <dl className="stream-stats">
               <div>
                 <dt>Download</dt>
@@ -57,7 +57,7 @@ export default function PlayerPanel({
               {formatBytes(stats.downloaded)} / {formatBytes(length)}
             </p>
           </div>
-        </>
+        </details>
       )}
       {children}
     </aside>

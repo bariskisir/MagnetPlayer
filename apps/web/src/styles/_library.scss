@@ -5,33 +5,31 @@
   flex-direction: column;
   min-height: 0;
   min-width: 0;
-  padding: 0 16px 24px 0;
+  padding: 0 12px 16px 0;
   border-right: 1px solid $line;
 }
-.sidebar-head,
-.player-side-head {
+.sidebar-head {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
   flex-shrink: 0;
-  padding-bottom: 18px;
-  min-height: 42px;
+  padding-bottom: 6px;
+  min-height: 38px;
 }
-.sidebar-head h2,
-.player-side-head h2 {
+.sidebar-head h2 {
   display: flex;
   align-items: center;
-  gap: 10px;
-  font-size: 14px;
+  gap: 8px;
+  font-size: 13px;
   font-weight: 500;
   letter-spacing: -0.2px;
 }
 .sidebar-head > button {
   display: grid;
   place-items: center;
-  width: 36px;
-  min-height: 36px;
+  width: 32px;
+  min-height: 32px;
   border-radius: $radius-small;
   color: $muted;
 }
@@ -44,7 +42,7 @@
   min-height: 0;
   display: grid;
   align-content: start;
-  gap: 6px;
+  gap: 4px;
   overflow: auto;
   overscroll-behavior: contain;
   padding: 4px;
@@ -67,18 +65,20 @@
   flex: 1;
   min-width: 0;
   display: grid;
-  gap: 9px;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 4px 8px;
   text-align: left;
-  padding: 14px 4px 14px 12px;
+  padding: 8px 4px 8px 8px;
 }
 .side-item.active .side-open:disabled {
   opacity: 1;
   cursor: default;
 }
 .side-name {
+  grid-column: 1 / -1;
   color: $text;
-  font-size: 13px;
-  line-height: 1.6;
+  font-size: 12px;
+  line-height: 1.5;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   line-clamp: 2;
@@ -94,11 +94,14 @@
 .side-item.active .side-meta {
   color: $accent;
 }
+.side-open > .watch-progress {
+  align-self: center;
+}
 .side-remove {
   display: grid;
   place-items: center;
   flex-shrink: 0;
-  padding: 8px;
+  padding: 6px;
   color: $muted;
   opacity: 0;
 }

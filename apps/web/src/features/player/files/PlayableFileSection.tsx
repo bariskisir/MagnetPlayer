@@ -39,6 +39,7 @@ export default function PlayableFileSection({
             <div key={file.path} className={`file-row${selected === file ? ' selected' : ''}`}>
               <button
                 className="file-select"
+                title={file.name}
                 onClick={() => onSelect(file)}
                 aria-current={selected === file ? 'true' : undefined}
               >

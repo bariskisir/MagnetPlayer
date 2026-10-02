@@ -55,6 +55,7 @@ class RemoteMediaFile implements MediaFile {
 
 export class TorrentSession {
   readonly infoHash: string
+  readonly magnet: string
   readonly name: string
   readonly files: RemoteMediaFile[]
   snapshot: TorrentSnapshot
@@ -68,6 +69,9 @@ export class TorrentSession {
   constructor(snapshot: TorrentSnapshot, controller: AbortController) {
     if (snapshot.error) throw new Error(snapshot.error)
     this.infoHash = snapshot.infoHash
+    this.magnet =
+      snapshot.magnet ||
+      `magnet:?xt=urn:btih:${snapshot.infoHash}&dn=${encodeURIComponent(snapshot.name)}`
     this.name = snapshot.name
     this.snapshot = snapshot
     this.controller = controller
@@ -154,10 +158,10 @@ export class TorrentSession {
   }
 }
 
-export async function openTorrentSession(magnet: string, controller: AbortController) {
+export async function openTorrentSession(input: string | File, controller: AbortController) {
   const snapshot = await helperRequest<TorrentSnapshot>('/api/torrents', {
     method: 'POST',
-    data: { magnet },
+    ...(typeof input === 'string' ? { data: { magnet: input } } : { file: input }),
     signal: controller.signal,
   })
   return new TorrentSession(snapshot, controller)

@@ -5,6 +5,7 @@ import { searchMagnet } from '../features/search/search-results'
 import ClearLibraryDialog from '../features/library/ClearLibraryDialog'
 import PlayerPanel from '../features/player/PlayerPanel'
 import MagnetForm from '../features/library/MagnetForm'
+import TorrentFileUpload from '../features/library/TorrentFileUpload'
 import LibrarySidebar from '../features/library/LibrarySidebar'
 import MediaFileList from '../features/player/files/MediaFileList'
 import HelperConnection from '../features/helper/HelperConnection'
@@ -68,6 +69,11 @@ export default function App() {
               >
                 <Search size={14} /> Search Torrents
               </button>
+              <TorrentFileUpload
+                connected={helper.connected}
+                busy={library.busy}
+                onUpload={library.open}
+              />
               <MagnetForm
                 compact
                 onAdd={library.open}
@@ -126,14 +132,21 @@ export default function App() {
               or find something to watch
               <span />
             </div>
-            <button
-              className="badge home-search-button"
-              onClick={() => setSearchOnline(true)}
-              disabled={!helper.connected}
-              title={helper.connected ? undefined : 'Connect the helper to search torrents.'}
-            >
-              <Search size={16} /> Search torrents
-            </button>
+            <div className="home-torrent-actions">
+              <button
+                className="badge home-search-button"
+                onClick={() => setSearchOnline(true)}
+                disabled={!helper.connected}
+                title={helper.connected ? undefined : 'Connect the helper to search torrents.'}
+              >
+                <Search size={16} /> Search torrents
+              </button>
+              <TorrentFileUpload
+                connected={helper.connected}
+                busy={library.busy}
+                onUpload={library.open}
+              />
+            </div>
             <p className="connection-note" role="status">
               <span className={`live-dot ${helper.connected ? '' : 'off'}`} />
               {helper.connected
