@@ -1,6 +1,6 @@
 # magnet-player-helper
 
-Local BitTorrent streaming companion for **https://web-magnet-player.vercel.app**.
+Local BitTorrent streaming companion for **https://magnetplayer.bariskisir.com**.
 
 ## Run
 
@@ -40,7 +40,7 @@ npx magnet-player-helper --auth
 
 | Option                | Behavior                                                                                           |
 | --------------------- | -------------------------------------------------------------------------------------------------- |
-| `--site URL`          | Website to open and allow; defaults to `https://web-magnet-player.vercel.app/`.                    |
+| `--site URL`          | Website to open and allow; defaults to `https://magnetplayer.bariskisir.com/`.                     |
 | `--port NUMBER`       | Port, default `45891`; accepted range `1024–65535`.                                                |
 | `--bind ADDRESS`      | Address to listen on, default `127.0.0.1`. `0.0.0.0` exposes it to the local network.              |
 | `--data-dir PATH`     | Override the default system temporary directory with a custom cache location.                      |

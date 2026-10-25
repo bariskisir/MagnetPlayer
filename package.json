@@ -1,7 +1,7 @@
 {
   "name": "magnet-player-repository",
   "private": true,
-  "version": "1.4.0",
+  "version": "1.4.1",
   "type": "module",
   "workspaces": [
     "apps/web",
@@ -29,10 +29,10 @@
     "build:web": "npm run build --workspace @bariskisir/magnet-player-web"
   },
   "devDependencies": {
-    "prettier": "^3.9.9",
-    "concurrently": "^10.0.5",
+    "prettier": "^3.9.10",
+    "concurrently": "^10.0.6",
     "tsx": "^4.23.15",
-    "@types/node": "^26.6.4",
+    "@types/node": "^26.6.5",
     "typescript": "^7.0.2"
   },
   "allowScripts": {

@@ -13,7 +13,7 @@
 </p>
 
 <p align="center">
-  <a href="https://web-magnet-player.vercel.app">https://web-magnet-player.vercel.app</a>
+  <a href="https://magnetplayer.bariskisir.com">https://magnetplayer.bariskisir.com</a>
 </p>
 
 Install [Node.js (LTS)](https://nodejs.org/en/download) first. Then open a terminal, check your npm version with `npm --version`, and run the matching command.
