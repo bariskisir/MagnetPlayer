@@ -12,6 +12,7 @@ import HelperConnection from '../features/helper/HelperConnection'
 import useLibrary from '../features/library/use-library'
 import { useHelperStatus } from '../features/helper/use-helper-status'
 import { isAudioFile } from '../shared/media'
+import { trackAppStartup } from './telemetry'
 
 const VideoPlayer = lazy(() => import('../features/player/VideoPlayer'))
 const AudioPlayer = lazy(() => import('../features/player/AudioPlayer'))
@@ -25,6 +26,10 @@ export default function App() {
   const started = library.entries.length > 0
   const MediaPlayer =
     library.selected && isAudioFile(library.selected.name) ? AudioPlayer : VideoPlayer
+
+  useEffect(() => {
+    void trackAppStartup()
+  }, [])
 
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
